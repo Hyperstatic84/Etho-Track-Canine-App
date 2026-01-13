@@ -1,368 +1,267 @@
-import React, { useState, useEffect, useRef } from 'react';
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etho-Track - Bilan Transition Canine</title>
+    <!-- Chargement de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chargement de React et Babel pour le support JSX en ligne -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        /* Styles personnalisés pour le curseur de la barre d'excitation */
+        input[type='range']::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #4f46e5;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="root"></div>
 
-// --- INLINE SVG ICONS ---
-const Icons = {
-  Activity: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-  ),
-  ClipboardList: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
-  ),
-  MapPin: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-  ),
-  Save: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-  ),
-  FileText: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
-  ),
-  Send: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-  ),
-  Target: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-  ),
-  Play: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-  ),
-  Square: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
-  ),
-  RotateCcw: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-  ),
-  Camera: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-  ),
-  Upload: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-  )
-};
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-const EthoTrackApp = () => {
-  // --- ÉTATS PRINCIPAUX ---
-  const [dogName, setDogName] = useState("Sanka");
-  const [dogPhoto, setDogPhoto] = useState(null);
-  const [sessions, setSessions] = useState([]);
-  const [location, setLocation] = useState("Localisation...");
-  const [formData, setFormData] = useState({
-    date: new Date().toLocaleDateString('fr-FR'),
-    environnement: 'campagne',
-    typeSortie: 'travail',
-    latence: '2',
-    excitation: 3,
-    reactionSociale: 'indifference',
-    redescente: 'moyenne',
-    notes: ''
-  });
-  const [showReport, setShowReport] = useState(false);
-  const [message, setMessage] = useState(null);
+        // --- INLINE SVG ICONS ---
+        const Icons = {
+            Activity: () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            ),
+            ClipboardList: () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+            ),
+            MapPin: () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            ),
+            Save: () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            ),
+            FileText: () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+            ),
+            Send: () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            ),
+            Target: () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            ),
+            Play: () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            ),
+            Square: () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
+            ),
+            RotateCcw: () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            ),
+            Camera: () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            )
+        };
 
-  // --- ÉTATS DU CHRONOMÈTRE ---
-  const [timer, setTimer] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const timerRef = useRef(null);
-  const fileInputRef = useRef(null);
+        const App = () => {
+            const [dogName, setDogName] = useState("Sanka");
+            const [dogPhoto, setDogPhoto] = useState(null);
+            const [sessions, setSessions] = useState([]);
+            const [location, setLocation] = useState("Localisation...");
+            const [formData, setFormData] = useState({
+                date: new Date().toLocaleDateString('fr-FR'),
+                environnement: 'campagne',
+                typeSortie: 'travail',
+                latence: '2',
+                excitation: 3,
+                reactionSociale: 'indifference',
+                redescente: 'moyenne',
+                notes: ''
+            });
+            const [showReport, setShowReport] = useState(false);
+            const [message, setMessage] = useState(null);
 
-  // --- GÉOLOCALISATION ---
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-            const data = await response.json();
-            const city = data.address.city || data.address.town || data.address.village || "Lieu inconnu";
-            setLocation(city);
-          } catch (error) {
-            setLocation(`${latitude.toFixed(2)}, ${longitude.toFixed(2)}`);
-          }
-        },
-        () => setLocation("GPS désactivé")
-      );
-    }
-  }, []);
+            const [timer, setTimer] = useState(0);
+            const [isTimerRunning, setIsTimerRunning] = useState(false);
+            const timerRef = useRef(null);
+            const fileInputRef = useRef(null);
 
-  // --- LOGIQUE PHOTO ---
-  const handlePhotoUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setDogPhoto(reader.result);
-      reader.readAsDataURL(file);
-    }
-  };
+            useEffect(() => {
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        async (position) => {
+                            const { latitude, longitude } = position.coords;
+                            try {
+                                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                                const data = await response.json();
+                                const city = data.address.city || data.address.town || data.address.village || "Lieu inconnu";
+                                setLocation(city);
+                            } catch (error) {
+                                setLocation(`${latitude.toFixed(2)}, ${longitude.toFixed(2)}`);
+                            }
+                        },
+                        () => setLocation("GPS désactivé")
+                    );
+                }
+            }, []);
 
-  const triggerCamera = () => {
-    // Note: Utilise le même input avec l'attribut capture pour mobile
-    fileInputRef.current.click();
-  };
+            useEffect(() => {
+                if (isTimerRunning) {
+                    timerRef.current = setInterval(() => setTimer(t => t + 0.1), 100);
+                } else {
+                    clearInterval(timerRef.current);
+                }
+                return () => clearInterval(timerRef.current);
+            }, [isTimerRunning]);
 
-  // --- LOGIQUE CHRONO ---
-  useEffect(() => {
-    if (isTimerRunning) {
-      timerRef.current = setInterval(() => {
-        setTimer((prev) => prev + 0.1);
-      }, 100);
-    } else {
-      clearInterval(timerRef.current);
-    }
-    return () => clearInterval(timerRef.current);
-  }, [isTimerRunning]);
+            const handlePhotoUpload = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => setDogPhoto(reader.result);
+                    reader.readAsDataURL(file);
+                }
+            };
 
-  const toggleTimer = () => setIsTimerRunning(!isTimerRunning);
-  const resetTimer = () => {
-    setIsTimerRunning(false);
-    setTimer(0);
-  };
+            const handleSaveSession = () => {
+                setSessions([formData, ...sessions]);
+                setMessage("Session enregistrée !");
+                setTimeout(() => setMessage(null), 3000);
+                setFormData({ ...formData, notes: '', date: new Date().toLocaleDateString('fr-FR') });
+                setIsTimerRunning(false);
+                setTimer(0);
+            };
 
-  // --- LOGIQUE FORMULAIRE ---
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+            const calculateStats = () => {
+                if (sessions.length === 0) return null;
+                const avgExcitation = (sessions.reduce((acc, s) => acc + parseInt(s.excitation), 0) / sessions.length).toFixed(1);
+                const focusRate = (sessions.filter(s => s.reactionSociale === 'indifference').length / sessions.length * 100).toFixed(0);
+                return { avgExcitation, focusRate };
+            };
 
-  const handleSaveSession = () => {
-    setSessions([formData, ...sessions]);
-    setMessage("Session enregistrée !");
-    setTimeout(() => setMessage(null), 3000);
-    setFormData({
-      ...formData, 
-      notes: '', 
-      date: new Date().toLocaleDateString('fr-FR')
-    });
-    resetTimer();
-  };
+            const stats = calculateStats();
 
-  const calculateStats = () => {
-    if (sessions.length === 0) return null;
-    const avgExcitation = (sessions.reduce((acc, s) => acc + parseInt(s.excitation), 0) / sessions.length).toFixed(1);
-    const focusRate = (sessions.filter(s => s.reactionSociale === 'indifference').length / sessions.length * 100).toFixed(0);
-    return { avgExcitation, focusRate };
-  };
+            return (
+                <div className="max-w-md mx-auto bg-gray-50 min-h-screen pb-10 shadow-2xl font-sans text-gray-800">
+                    {message && (
+                        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-2 rounded-full shadow-lg font-bold animate-bounce">
+                            {message}
+                        </div>
+                    )}
 
-  const stats = calculateStats();
+                    <header className="bg-gradient-to-br from-indigo-700 to-indigo-900 text-white p-6 rounded-b-[2.5rem] shadow-xl relative overflow-hidden">
+                        <div className="relative z-10 flex justify-between items-start">
+                            <div>
+                                <h1 className="text-2xl font-bold flex items-center gap-2">
+                                    <span className="text-green-400"><Icons.Activity /></span> 
+                                    Etho-Track
+                                </h1>
+                                <p className="text-indigo-100 text-[10px] uppercase tracking-widest mt-1 font-semibold opacity-80">Transition Canine</p>
+                            </div>
+                            <div className="bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/20 flex items-center gap-2 max-w-[150px]">
+                                <span className="text-white/80"><Icons.MapPin /></span>
+                                <span className="text-[10px] font-bold truncate">{location}</span>
+                            </div>
+                        </div>
 
-  const handleSendEmail = () => {
-    const subject = `Bilan de suivi : Évolution de ${dogName}`;
-    const body = `Bonjour,\n\nVoici le bilan des dernières sessions pour ${dogName}.\n\nStatistiques :\n- Excitation moyenne : ${stats?.avgExcitation}/5\n- Taux de focus : ${stats?.focusRate}%\n\nNotes récentes : ${sessions[0]?.notes}\n\nCordialement,\nVotre Comportementaliste.`;
-    window.location.href = `mailto:client@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
+                        {stats && (
+                            <div className="relative z-10 flex gap-4 mt-6">
+                                <div className="bg-white/10 flex-1 p-3 rounded-2xl backdrop-blur-sm border border-white/10 text-center">
+                                    <p className="text-[10px] uppercase opacity-70 font-bold">Focus Maître</p>
+                                    <p className="text-2xl font-black">{stats.focusRate}%</p>
+                                </div>
+                                <div className="bg-white/10 flex-1 p-3 rounded-2xl backdrop-blur-sm border border-white/10 text-center">
+                                    <p className="text-[10px] uppercase opacity-70 font-bold">Excitation</p>
+                                    <p className="text-2xl font-black">{stats.avgExcitation}</p>
+                                </div>
+                            </div>
+                        )}
+                    </header>
 
-  return (
-    <div className="max-w-md mx-auto bg-gray-50 min-h-screen pb-10 shadow-2xl font-sans text-gray-800">
-      
-      {message && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-2 rounded-full shadow-lg font-bold animate-bounce">
-          {message}
-        </div>
-      )}
+                    <main className="p-4 space-y-6 -mt-4 relative z-20">
+                        {/* PROFIL DU CHIEN */}
+                        <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col items-center gap-4">
+                            <div className="relative w-32 h-32">
+                                <div className="w-full h-full rounded-full overflow-hidden bg-indigo-50 border-4 border-white shadow-md flex items-center justify-center">
+                                    {dogPhoto ? <img src={dogPhoto} className="w-full h-full object-cover" /> : <span className="text-4xl">🐕</span>}
+                                </div>
+                                <button onClick={() => fileInputRef.current.click()} className="absolute bottom-0 right-0 bg-indigo-600 text-white p-2 rounded-full shadow-lg">
+                                    <Icons.Camera />
+                                </button>
+                                <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} accept="image/*" className="hidden" />
+                            </div>
+                            <input type="text" value={dogName} onChange={(e) => setDogName(e.target.value)} className="text-2xl font-black text-indigo-900 border-none bg-transparent text-center focus:ring-0 w-full" />
+                        </div>
 
-      {/* HEADER */}
-      <header className="bg-gradient-to-br from-indigo-700 to-indigo-900 text-white p-6 rounded-b-[2.5rem] shadow-xl relative overflow-hidden">
-        <div className="relative z-10 flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <span className="text-green-400"><Icons.Activity /></span> 
-              Etho-Track
-            </h1>
-            <p className="text-indigo-100 text-[10px] uppercase tracking-widest mt-1 font-semibold opacity-80">
-              Bilan Transition Canine
-            </p>
-          </div>
-          <div className="bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/20 flex items-center gap-2 max-w-[150px]">
-            <span className="text-white/80 shrink-0"><Icons.MapPin /></span>
-            <span className="text-[10px] font-bold truncate tracking-tight">{location}</span>
-          </div>
-        </div>
+                        {/* FORMULAIRE */}
+                        <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 space-y-4">
+                            <h2 className="text-indigo-900 font-bold flex items-center gap-2 border-b pb-3">
+                                <Icons.ClipboardList /> Saisie Terrain
+                            </h2>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase">Milieu</label>
+                                    <select name="environnement" value={formData.environnement} onChange={(e) => setFormData({...formData, environnement: e.target.value})} className="w-full p-3 bg-gray-50 rounded-2xl text-sm outline-none">
+                                        <option value="campagne">🏞️ Campagne</option>
+                                        <option value="ville">🏙️ Ville</option>
+                                        <option value="foret">🌲 Forêt</option>
+                                        <option value="plage">🏖️ Plage</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase">Activité</label>
+                                    <select name="typeSortie" value={formData.typeSortie} onChange={(e) => setFormData({...formData, typeSortie: e.target.value})} className="w-full p-3 bg-gray-50 rounded-2xl text-sm outline-none">
+                                        <option value="travail">🎯 Recherche</option>
+                                        <option value="mulotage">🐭 Mulotage</option>
+                                        <option value="balade">🦮 Balade</option>
+                                    </select>
+                                </div>
+                            </div>
 
-        {stats && (
-          <div className="relative z-10 flex gap-4 mt-6">
-            <div className="bg-white/10 flex-1 p-3 rounded-2xl backdrop-blur-sm border border-white/10 text-center">
-              <p className="text-[10px] uppercase opacity-70 font-bold">Focus Maître</p>
-              <p className="text-2xl font-black">{stats.focusRate}%</p>
-            </div>
-            <div className="bg-white/10 flex-1 p-3 rounded-2xl backdrop-blur-sm border border-white/10 text-center">
-              <p className="text-[10px] uppercase opacity-70 font-bold">Excitation Moy.</p>
-              <p className="text-2xl font-black">{stats.avgExcitation}<span className="text-sm opacity-50">/5</span></p>
-            </div>
-          </div>
-        )}
-        <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
-      </header>
+                            <div className="flex items-center gap-3 bg-indigo-50 p-3 rounded-2xl border border-indigo-100">
+                                <div className="flex-1 text-center">
+                                    <span className="text-xs font-bold text-indigo-400 block mb-1 uppercase">Timer</span>
+                                    <span className="text-xl font-mono font-black">{timer.toFixed(1)}s</span>
+                                </div>
+                                <button onClick={() => setIsTimerRunning(!isTimerRunning)} className={`p-2 rounded-xl text-white ${isTimerRunning ? 'bg-red-500' : 'bg-indigo-600'}`}>
+                                    {isTimerRunning ? <Icons.Square /> : <Icons.Play />}
+                                </button>
+                                <button onClick={() => {setIsTimerRunning(false); setTimer(0)}} className="p-2 bg-white text-indigo-600 rounded-xl border border-indigo-200">
+                                    <Icons.RotateCcw />
+                                </button>
+                            </div>
 
-      <main className="p-4 space-y-6 -mt-4 relative z-20">
-        
-        {/* IDENTITÉ DU CHIEN */}
-        <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col items-center gap-4">
-          <div className="relative group w-32 h-32">
-            <div className="w-full h-full rounded-full overflow-hidden bg-indigo-50 border-4 border-white shadow-md flex items-center justify-center">
-              {dogPhoto ? (
-                <img src={dogPhoto} alt="Dog" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-4xl">🐕</span>
-              )}
-            </div>
-            <button 
-              onClick={triggerCamera}
-              className="absolute bottom-0 right-0 bg-indigo-600 text-white p-2 rounded-full shadow-lg hover:bg-indigo-700 transition-colors"
-            >
-              <Icons.Camera />
-            </button>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handlePhotoUpload} 
-              accept="image/*" 
-              className="hidden" 
-            />
-          </div>
-          
-          <div className="w-full text-center">
-            <input 
-              type="text" 
-              value={dogName} 
-              onChange={(e) => setDogName(e.target.value)}
-              placeholder="Nom du chien"
-              className="text-2xl font-black text-indigo-900 border-none bg-transparent text-center focus:ring-0 w-full placeholder-indigo-200"
-            />
-            <div className="h-0.5 w-12 bg-indigo-100 mx-auto mt-1 rounded-full"></div>
-          </div>
-        </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase flex justify-between">Excitation <span>{formData.excitation}/5</span></label>
+                                <input type="range" min="1" max="5" value={formData.excitation} onChange={(e) => setFormData({...formData, excitation: e.target.value})} className="w-full h-2 bg-indigo-100 rounded-lg appearance-none accent-indigo-600"/>
+                            </div>
 
-        {/* FORMULAIRE DE SAISIE */}
-        <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 space-y-4">
-          <h2 className="text-indigo-900 font-bold flex items-center gap-2 border-b pb-3 text-lg">
-            <span className="text-indigo-600"><Icons.ClipboardList /></span>
-            Saisie Terrain
-          </h2>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Milieu</label>
-              <select name="environnement" value={formData.environnement} onChange={handleChange} className="w-full p-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none">
-                <option value="campagne">🏞️ Campagne</option>
-                <option value="ville">🏙️ Ville</option>
-                <option value="foret">🌲 Forêt</option>
-                <option value="plage">🏖️ Plage</option>
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Activité</label>
-              <select name="typeSortie" value={formData.typeSortie} onChange={handleChange} className="w-full p-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none">
-                <option value="travail">🎯 Recherche</option>
-                <option value="mulotage">🐭 Mulotage</option>
-                <option value="social">🤝 Social</option>
-                <option value="balade">🦮 Balade</option>
-              </select>
-            </div>
-          </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase">Réaction Sociale</label>
+                                <select value={formData.reactionSociale} onChange={(e) => setFormData({...formData, reactionSociale: e.target.value})} className="w-full p-3 bg-gray-50 rounded-2xl text-sm outline-none">
+                                    <option value="indifference">😐 Focus Maître</option>
+                                    <option value="vigilance">🧐 Vigilance</option>
+                                    <option value="tension">🐕 Tension laisse</option>
+                                </select>
+                            </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Latence de Déconnexion</label>
-            <select name="latence" value={formData.latence} onChange={handleChange} className="w-full p-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none">
-              <option value="1">Immédiate (&lt; 2s)</option>
-              <option value="2">Modérée (2s - 10s)</option>
-              <option value="3">Difficile (&gt; 10s)</option>
-            </select>
-            
-            <div className="flex items-center gap-3 bg-indigo-50 p-3 rounded-2xl border border-indigo-100">
-              <div className="flex-1 text-center">
-                <span className="text-xs font-bold text-indigo-400 uppercase block leading-none mb-1">Timer</span>
-                <span className={`text-xl font-mono font-black ${isTimerRunning ? 'text-indigo-600' : 'text-gray-400'}`}>
-                  {timer.toFixed(1)}s
-                </span>
-              </div>
-              <div className="flex gap-2">
-                <button 
-                  onClick={toggleTimer}
-                  className={`p-2 rounded-xl transition-all shadow-sm ${isTimerRunning ? 'bg-red-500 text-white' : 'bg-indigo-600 text-white'}`}
-                >
-                  {isTimerRunning ? <Icons.Square /> : <Icons.Play />}
-                </button>
-                <button 
-                  onClick={resetTimer}
-                  className="p-2 bg-white text-indigo-600 rounded-xl border border-indigo-200 shadow-sm"
-                >
-                  <Icons.RotateCcw />
-                </button>
-              </div>
-            </div>
-          </div>
+                            <textarea value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} placeholder="Notes..." className="w-full p-4 bg-gray-50 rounded-2xl text-sm h-24 outline-none resize-none"></textarea>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter flex justify-between">
-              Niveau Excitation 
-              <span className={`px-2 py-0.5 rounded text-white ${formData.excitation > 3 ? 'bg-orange-500' : 'bg-green-500'}`}>
-                {formData.excitation}/5
-              </span>
-            </label>
-            <input type="range" name="excitation" min="1" max="5" value={formData.excitation} onChange={handleChange} className="w-full h-2 bg-indigo-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"/>
-          </div>
+                            <button onClick={handleSaveSession} className="w-full bg-green-500 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                                <Icons.Save /> ENREGISTRER
+                            </button>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
 
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Réaction Sociale Humaine</label>
-            <select name="reactionSociale" value={formData.reactionSociale} onChange={handleChange} className="w-full p-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none">
-              <option value="indifference">😐 Focus Maître</option>
-              <option value="vigilance">🧐 Vigilance / Fixation</option>
-              <option value="tension">🐕 Tension de laisse</option>
-              <option value="contact">🚀 Fonce au contact</option>
-            </select>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Observations</label>
-            <textarea name="notes" value={formData.notes} onChange={handleChange} placeholder="Détails (vent, stimuli...)" className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm h-24 outline-none focus:ring-2 focus:ring-indigo-400 resize-none transition-all"></textarea>
-          </div>
-
-          <button onClick={handleSaveSession} className="w-full bg-green-500 hover:bg-green-600 active:scale-95 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all transform">
-            <Icons.Save /> ENREGISTRER LA SESSION
-          </button>
-        </div>
-
-        {/* ACTIONS ANALYTIQUES */}
-        {sessions.length > 0 && (
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button onClick={() => setShowReport(!showReport)} className={`flex-1 font-bold py-3 rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all ${showReport ? "bg-indigo-100 text-indigo-800 border-2 border-indigo-200" : "bg-white border-2 border-indigo-600 text-indigo-600"}`}>
-              <Icons.FileText /> {showReport ? "Masquer Analyse" : "Voir Rapport"}
-            </button>
-            <button onClick={handleSendEmail} className="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">
-              <Icons.Send /> Envoyer au Client
-            </button>
-          </div>
-        )}
-
-        {/* RAPPORT D'ANALYSE */}
-        {showReport && stats && (
-          <div className="bg-indigo-50 p-6 rounded-[2rem] border-2 border-dashed border-indigo-200 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h3 className="font-bold text-indigo-900 mb-4 flex items-center gap-2 text-lg">
-              <span className="text-indigo-600"><Icons.Target /></span>
-              Analyse des tendances de {dogName}
-            </h3>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm">
-                <span className="text-sm font-medium text-gray-600">Stabilité émotionnelle :</span>
-                <span className={`text-sm font-bold px-3 py-1 rounded-full ${stats.avgExcitation < 3 ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
-                  {stats.avgExcitation < 3 ? "Excellente" : "À surveiller"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm">
-                <span className="text-sm font-medium text-gray-600">Renoncement social :</span>
-                <span className="text-sm font-bold text-indigo-700">{stats.focusRate}% de réussite</span>
-              </div>
-              <div className="mt-4 p-4 bg-white rounded-2xl text-sm italic text-gray-600 shadow-inner border-l-4 border-indigo-400">
-                {stats.avgExcitation > 3 ? "Seuils d'excitation élevés détectés." : "Bonne gestion émotionnelle globale."}
-                <br />
-                {stats.focusRate < 50 ? "Focus sur l'humain à renforcer." : "Engagement client/chien très positif."}
-              </div>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
-  );
-};
-
-export default EthoTrackApp;
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
