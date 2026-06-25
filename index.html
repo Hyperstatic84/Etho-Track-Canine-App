@@ -78,6 +78,25 @@
         .logo-sep { font-weight: 100; opacity: 0.3; margin: 0 0.1em; -webkit-text-fill-color: white; }
         .logo-accent { font-weight: 500; color: #818cf8; -webkit-text-fill-color: #818cf8; }
 
+        /* ── HELP BUTTON ── */
+        .header-top { width: 100%; max-width: 400px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .help-btn {
+            position: absolute; right: 0;
+            width: 2.25rem; height: 2.25rem; border-radius: 50%;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25);
+            color: rgba(255,255,255,0.7); font-size: 1rem; font-weight: 900;
+            cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        .help-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+
+        /* ── HELP MODAL ── */
+        .help-modal-card { max-width: 26rem; }
+        .help-body { font-size: 0.8125rem; line-height: 1.65; color: rgba(255,255,255,0.85); display: flex; flex-direction: column; gap: 0.85rem; }
+        .help-body strong { color: white; font-weight: 900; }
+        .help-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+        .help-list li { padding-left: 1.25rem; position: relative; }
+        .help-list li::before { content: '•'; position: absolute; left: 0; color: #4ade80; font-weight: 900; }
+
         /* ── GPS ── */
         #gps-widget { width: 100%; max-width: 400px; display: flex; justify-content: center; }
 
@@ -377,6 +396,26 @@
     </div>
 
     <!-- Report modal -->
+    <div id="help-modal" class="modal-overlay">
+        <div class="glass modal-card help-modal-card">
+            <div class="modal-head">
+                <h3 class="modal-title">ℹ Informations importantes</h3>
+                <button class="modal-x" id="help-modal-close">✕</button>
+            </div>
+            <div class="modal-body help-body">
+                <p><strong>Ces données ne sont pas des notes.</strong></p>
+                <p>Etho-Track ne juge ni l'animal, ni son propriétaire. Les indicateurs saisis — réactivité, excitation, rappel, vocalises — sont de pures <strong>données comportementales objectives</strong>, destinées à être interprétées par un professionnel de l'éthologie ou du comportement animal.</p>
+                <p>Aucun chiffre affiché ne constitue un verdict. Une excitation élevée n'est pas un défaut ; un rappel lent n'est pas un échec. Ce sont des <strong>faits bruts</strong>, des points de données sans valeur morale.</p>
+                <p>Pour que ce suivi ait de la valeur scientifique, il exige deux qualités essentielles :</p>
+                <ul class="help-list">
+                    <li><strong>Rigueur</strong> — Saisir chaque session sans sélectionner les « bonnes » séances. La fidélité de l'ensemble prime sur la beauté d'une entrée isolée.</li>
+                    <li><strong>Honnêteté</strong> — Décrire ce qui s'est réellement passé, pas ce qu'on aurait voulu. Une donnée imprécise fausse l'analyse entière.</li>
+                </ul>
+                <p>Ces informations, remises à un spécialiste, lui permettent de construire un accompagnement <strong>adapté et bienveillant</strong> pour vous et votre chien.</p>
+            </div>
+        </div>
+    </div>
+
     <div id="report-modal" class="modal-overlay">
         <div class="glass modal-card">
             <div class="modal-head">
@@ -396,9 +435,12 @@
         <div class="bg-orb-2"></div>
 
         <header>
-            <div class="logo">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="logo-icon"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                <span class="logo-main">Etho</span><span class="logo-sep"> – </span><span class="logo-accent">Track</span>
+            <div class="header-top">
+                <div class="logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="logo-icon"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    <span class="logo-main">Etho</span><span class="logo-sep"> – </span><span class="logo-accent">Track</span>
+                </div>
+                <button class="help-btn" id="help-btn" aria-label="Aide">?</button>
             </div>
 
             <div id="gps-widget">
@@ -696,6 +738,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Report
     document.getElementById('report-btn').addEventListener('click', openReport);
     document.getElementById('modal-close-btn').addEventListener('click', closeReport);
+    document.getElementById('help-btn').addEventListener('click', () => document.getElementById('help-modal').classList.add('open'));
+    document.getElementById('help-modal-close').addEventListener('click', () => document.getElementById('help-modal').classList.remove('open'));
+    document.getElementById('help-modal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); });
     document.getElementById('copy-btn').addEventListener('click', copyReport);
     document.getElementById('share-btn').addEventListener('click', shareReport);
 
