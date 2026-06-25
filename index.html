@@ -5,1237 +5,1060 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Etho-Track - Bilan</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234ade80' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M22 12h-4l-3 9L9 3l-3 9H2'/%3e%3c/svg%3e">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233730a3'%3e%3crect width='24' height='24' rx='5' fill='%233730a3'/%3e%3cpath d='M22 12h-4l-3 9L9 3l-3 9H2' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e">
+    <link rel="apple-touch-icon" href="icon.svg">
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Etho-Track">
     <meta name="theme-color" content="#3730a3">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234ade80' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M22 12h-4l-3 9L9 3l-3 9H2'/%3e%3c/svg%3e">
-    <link rel="apple-touch-icon" href="icon.svg">
-    <script src="https://unpkg.com/@tailwindcss/browser@4.1.8/dist/cdn.global.js"></script>
-    <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone@7.26.10/babel.min.js"></script>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://api.open-meteo.com https://nominatim.openstreetmap.org; img-src 'self' data: blob:; object-src 'none'; base-uri 'self';">
     <style>
-        /* Fond global indigo profond avec dégradé */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
             background: linear-gradient(135deg, #3730a3 0%, #1e1b4b 100%);
             min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+            color: #fff;
+            overflow-x: hidden;
         }
 
-        /* Aspect verre dépoli pour les cartes */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.12) !important;
+        .app {
+            max-width: 448px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding-bottom: 2.5rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .bg-orb-1 {
+            position: fixed; top: 10%; left: -20%;
+            width: 16rem; height: 16rem;
+            background: rgba(99,102,241,0.3);
+            border-radius: 50%; filter: blur(100px);
+            z-index: -1; pointer-events: none;
+        }
+        .bg-orb-2 {
+            position: fixed; bottom: 20%; right: -10%;
+            width: 20rem; height: 20rem;
+            background: rgba(168,85,247,0.2);
+            border-radius: 50%; filter: blur(120px);
+            z-index: -1; pointer-events: none;
+        }
+
+        .glass {
+            background: rgba(255,255,255,0.12);
             backdrop-filter: blur(16px) saturate(180%);
             -webkit-backdrop-filter: blur(16px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
 
-        /* STYLE LOGO MODERNE ET FIN */
-        .logo-container {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
+        /* ── HEADER ── */
+        header {
+            padding: 5rem 1rem 1.5rem;
+            display: flex; flex-direction: column; align-items: center; gap: 1rem;
         }
 
+        .logo {
+            display: flex; align-items: center; gap: 0.75rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            letter-spacing: 0.15em; text-transform: uppercase; font-style: italic;
+            font-size: 2.25rem;
+        }
+        .logo-icon { color: #4ade80; filter: drop-shadow(0 0 8px rgba(74,222,128,0.4)); }
         .logo-main {
             font-weight: 200;
-            background: linear-gradient(to right, #ffffff, #c7d2fe);
-            -webkit-background-clip: text;
+            background: linear-gradient(to right, #fff, #c7d2fe);
+            -webkit-background-clip: text; background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        .logo-sep { font-weight: 100; opacity: 0.3; margin: 0 0.1em; -webkit-text-fill-color: white; }
+        .logo-accent { font-weight: 500; color: #818cf8; -webkit-text-fill-color: #818cf8; }
 
-        .logo-separator {
-            font-weight: 100;
-            opacity: 0.3;
-            margin: 0 0.1em;
-        }
+        /* ── GPS ── */
+        #gps-widget { width: 100%; max-width: 400px; display: flex; justify-content: center; }
 
-        .logo-accent {
-            font-weight: 500;
-            color: #818cf8;
-            -webkit-text-fill-color: #818cf8;
+        .gps-btn {
+            width: 100%; max-width: 280px;
+            background: rgba(34,197,94,0.8); color: white;
+            padding: 1rem 1.5rem; border-radius: 9999px;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em;
+            cursor: pointer; animation: pulse 2s infinite;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
 
-        /* Icône de logo spécifique avec ombre portée */
-        .logo-icon {
-            filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.4));
+        .gps-card {
+            width: 100%; background: rgba(255,255,255,0.1);
+            padding: 1.25rem; border-radius: 2.5rem;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
+        .gps-location {
+            display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+            width: 100%; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem;
+        }
+        .gps-city { display: flex; align-items: center; gap: 0.5rem; color: #4ade80; }
+        .gps-city span { font-size: 1.25rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .gps-coords { opacity: 0.5; font-size: 0.7rem; font-family: monospace; }
+        .weather-row { display: flex; align-items: center; justify-content: space-around; width: 100%; }
+        .weather-item { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; }
+        .weather-val { font-size: 1.25rem; font-weight: 900; }
+        .weather-emoji { font-size: 1.5rem; }
+        .weather-lbl { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; opacity: 0.6; }
+        .weather-div { width: 1px; height: 2.5rem; background: rgba(255,255,255,0.1); }
 
-        /* Menu Burger plus opaque */
-        .burger-menu-content {
-            background: rgba(30, 27, 75, 0.95) !important;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        /* ── STATS ── */
+        #stats-widget { width: 100%; padding: 0 0.25rem; display: none; }
+        .stats-row { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .stat-card {
+            background: rgba(255,255,255,0.05); flex: 1;
+            padding: 1rem; border-radius: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1); text-align: center;
         }
+        .stat-lbl { font-size: 0.6rem; text-transform: uppercase; opacity: 0.5; font-weight: 900; letter-spacing: 0.1em; margin-bottom: 0.25rem; }
+        .stat-val { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.05em; }
 
-        /* Système d'alerte placé à 10% DU HAUT gg */
-        .alert-overlay {
-            position: fixed;
-            top: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            pointer-events: none;
-            width: 80%;
-            max-width: 300px;
-        }
+        /* ── MAIN ── */
+        main { padding: 1rem; display: flex; flex-direction: column; gap: 1.5rem; position: relative; z-index: 20; }
 
-        .alert-box {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(20px) saturate(160%);
-            -webkit-backdrop-filter: blur(20px) saturate(160%);
-            color: #ffffff;
-            padding: 1rem 1.25rem;
-            border-radius: 2rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            animation: alertIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            text-align: center;
-            font-size: 0.8rem;
+        /* ── PROFILE CARD ── */
+        .profile-card {
+            padding: 1.5rem; border-radius: 2.5rem;
+            display: flex; flex-direction: column; align-items: center; gap: 1rem;
+            position: relative; overflow: visible; z-index: 40;
         }
+        .menu-anchor { position: absolute; top: 1.5rem; left: 1.5rem; z-index: 50; }
+        .burger-btn {
+            background: transparent; border: none; color: rgba(255,255,255,0.5);
+            cursor: pointer; padding: 0.5rem; font-size: 1.5rem; line-height: 1;
+            transition: color 0.2s;
+        }
+        .burger-btn:hover { color: white; }
 
-        @keyframes alertIn {
-            from { opacity: 0; transform: translateY(-40px) scale(0.8); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        .profiles-dropdown {
+            position: absolute; top: 2.5rem; left: 0; width: 18rem;
+            background: rgba(30,27,75,0.97);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            border-radius: 1.5rem; padding: 0.75rem 0;
+            display: none; animation: slideDown 0.3s ease-out;
         }
+        .profiles-dropdown.open { display: block; }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
 
-        .glass-text {
-            color: white !important;
+        .dd-head {
+            padding: 0 1rem 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .glass-label {
-            color: rgba(255, 255, 255, 0.6) !important;
-        }
+        .dd-title { font-size: 0.6rem; font-weight: 900; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; }
+        .dd-close { background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 1.25rem; line-height: 1; }
 
-        input[type='range']::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 32px;
-            height: 32px;
-            background: #ffffff;
-            cursor: pointer;
-            border-radius: 50%;
-            border: 4px solid #4f46e5;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        .json-btns { padding: 0.75rem 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem; }
+        .json-btn {
+            background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.3);
+            color: #c7d2fe; padding: 0.75rem; border-radius: 0.75rem;
+            display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+            cursor: pointer; font-size: 0.55rem; font-weight: 900; text-transform: uppercase;
+            transition: filter 0.2s;
         }
+        .json-btn.import { background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.3); color: #bbf7d0; }
+        .json-btn:hover { filter: brightness(1.3); }
+        .json-icon { font-size: 1.1rem; }
 
-        .menu-appear {
-            animation: slideDown 0.3s ease-out forwards;
+        .profile-list { max-height: 15rem; overflow-y: auto; }
+        .profile-item { padding: 0.75rem 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .profile-item:hover { background: rgba(255,255,255,0.1); }
+        .pi-info { display: flex; flex-direction: column; }
+        .pi-name { font-weight: 700; font-size: 0.875rem; }
+        .pi-sub { font-size: 0.6rem; color: rgba(255,255,255,0.4); }
+        .pi-del { background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; padding: 0.5rem; transition: color 0.2s; font-size: 0.9rem; }
+        .pi-del:hover { color: #f87171; }
+        .no-profiles { padding: 1rem; font-size: 0.75rem; font-style: italic; color: rgba(255,255,255,0.3); }
+
+        .save-profile-btn {
+            position: absolute; top: 1.5rem; right: 1.5rem; z-index: 30;
+            background: transparent; border: none; color: rgba(255,255,255,0.5);
+            cursor: pointer; padding: 0.5rem; font-size: 1.3rem; transition: color 0.2s;
         }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .save-profile-btn:hover { color: #4ade80; }
+
+        /* Photo */
+        .photo-wrapper { position: relative; width: 8rem; height: 8rem; margin-top: 1rem; }
+        .photo-btn {
+            width: 100%; height: 100%; border-radius: 50%; overflow: hidden;
+            background: rgba(255,255,255,0.1); border: 4px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+            cursor: pointer; transition: transform 0.2s;
         }
+        .photo-btn:hover { transform: scale(1.05); }
+        .photo-btn:active { transform: scale(0.95); }
+        .photo-placeholder { font-size: 2.5rem; }
+        .photo-lbl { font-size: 0.5rem; font-weight: 900; color: rgba(255,255,255,0.6); text-transform: uppercase; }
+        .photo-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .photo-menu {
+            position: absolute; top: 84%; left: 50%; transform: translateX(-50%);
+            margin-top: 0.5rem; width: 12rem;
+            background: #1e1b4b; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 1.25rem; box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            overflow: hidden; z-index: 40; display: none;
+        }
+        .photo-menu.open { display: block; }
+        .pm-btn {
+            width: 100%; background: none; border: none; color: white;
+            padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.75rem;
+            font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: background 0.2s;
+        }
+        .pm-btn:hover { background: rgba(255,255,255,0.1); }
+        .pm-btn + .pm-btn { border-top: 1px solid rgba(255,255,255,0.05); }
+
+        /* Profile fields */
+        .profile-fields { width: 100%; display: flex; flex-direction: column; gap: 0.75rem; }
+        .dog-name-input { font-size: 1.5rem; font-weight: 900; color: white; border: none; background: transparent; text-align: center; width: 100%; outline: none; }
+        .profile-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+        .pfield { display: flex; flex-direction: column; align-items: center; }
+        .pfield-lbl { font-size: 0.5625rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+        .pfield-input { background: rgba(255,255,255,0.05); border: none; border-radius: 0.75rem; color: white; font-size: 0.875rem; font-weight: 700; text-align: center; padding: 0.5rem; width: 100%; outline: none; }
+        .pfield-input::placeholder { color: rgba(255,255,255,0.2); }
+
+        /* ── FORM CARD ── */
+        .form-card { padding: 1.5rem; border-radius: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+        .form-title { font-weight: 900; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; text-transform: uppercase; font-size: 0.875rem; letter-spacing: 0.1em; }
+        .slbl { font-size: 0.75rem; font-weight: 900; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+
+        .glass-select {
+            width: 100%; padding: 1.25rem;
+            background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 1.5rem; color: white; font-size: 1.125rem; font-weight: 700;
+            outline: none; appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 1.25rem center; background-size: 1.5em;
+            transition: border-color 0.2s;
+        }
+        .glass-select:focus { border-color: rgba(255,255,255,0.3); }
+        .glass-select option { background: #1e1b4b; }
+
+        .attache-box { padding: 1.25rem; background: rgba(255,255,255,0.05); border-radius: 1.5rem; border: 1px solid rgba(255,255,255,0.1); }
+        .attache-box .slbl { color: white; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+        .tag-btn { padding: 1rem; border-radius: 1rem; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); cursor: pointer; }
+        .tag-btn:active { transform: scale(0.95); }
+        .tag-btn.active { background: white; color: #312e81; border-color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+
+        .social-box { padding: 1.25rem; background: rgba(255,255,255,0.05); border-radius: 1.5rem; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 0.75rem; }
+        .social-box .slbl { color: white; }
+
+        /* Timer section */
+        .timer-section { background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 2.5rem; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 1rem; }
+        .timer-row { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+        .timer-left { flex: 1; }
+        .sub-lbl { font-size: 0.6875rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.25rem; }
+        .timer-val { font-size: 2.5rem; font-family: monospace; font-weight: 900; line-height: 1; }
+        .timer-unit { font-size: 1.25rem; }
+        .timer-controls { display: flex; gap: 0.5rem; align-items: center; }
+        .btn-play { width: 5rem; height: 5rem; border-radius: 1rem; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 1.5rem; }
+        .btn-play:active { transform: scale(0.9); }
+        .btn-play.start { background: #4ade80; color: #312e81; }
+        .btn-play.stop { background: #ef4444; color: white; }
+        .btn-sm { width: 4rem; height: 4rem; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s; font-size: 1.25rem; }
+        .btn-sm:active { transform: scale(0.9); }
+        .timer-div { height: 1px; background: rgba(255,255,255,0.1); }
+        .rappel-row { display: flex; align-items: center; justify-content: space-between; }
+        .rappel-val { font-size: 2.5rem; font-weight: 900; line-height: 1; }
+        .rappel-controls { display: flex; align-items: center; gap: 0.75rem; }
+        .btn-plus { width: 5rem; height: 5rem; border-radius: 1rem; background: #4ade80; color: #312e81; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.3); font-size: 2rem; font-weight: 900; transition: transform 0.15s; }
+        .btn-plus:active { transform: scale(0.95); }
+
+        /* Recall */
+        .recall-box { padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); }
+        .recall-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+        .recall-btn { padding: 1rem; font-size: 0.875rem; font-weight: 900; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s; }
+        .recall-btn:active { transform: scale(0.95); }
+        .recall-btn.r-green { background: #22c55e; color: white; border-color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .recall-btn.r-orange { background: #f97316; color: white; border-color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .recall-btn.r-red { background: #ef4444; color: white; border-color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+
+        /* Excitation */
+        .exc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; }
+        .exc-level { font-size: 1.125rem; color: white; }
+        input[type='range'] { width: 100%; height: 1.25rem; background: rgba(255,255,255,0.1); border-radius: 9999px; appearance: none; -webkit-appearance: none; cursor: pointer; }
+        input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; width: 2rem; height: 2rem; background: white; border-radius: 50%; border: 4px solid #4f46e5; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
+        .slider-labels { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.6rem; font-weight: 700; color: rgba(255,255,255,0.6); }
+
+        /* Bark */
+        .bark-btn { width: 100%; padding: 1.25rem; border-radius: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.75rem; font-weight: 900; font-size: 1.125rem; cursor: pointer; transition: all 0.3s; border: 2px solid; }
+        .bark-btn:active { transform: scale(0.98); }
+        .bark-btn.off { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); }
+        .bark-btn.on { background: #f97316; border-color: #fb923c; color: white; box-shadow: 0 4px 20px rgba(249,115,22,0.4); }
+        @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
+        .bounce { display: inline-block; animation: bounce 1s infinite; }
+
+        /* Notes */
+        .notes-ta { width: 100%; padding: 1.25rem; background: rgba(255,255,255,0.05); border-radius: 2rem; border: 1px solid rgba(255,255,255,0.1); color: white; font-size: 0.875rem; height: 8rem; outline: none; resize: none; transition: all 0.2s; font-family: inherit; }
+        .notes-ta::placeholder { color: rgba(255,255,255,0.2); }
+        .notes-ta:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); }
+
+        /* Save session */
+        .btn-save-session { width: 100%; background: #22c55e; color: white; font-weight: 900; font-size: 1.25rem; padding: 1.75rem; border-radius: 2.5rem; border: none; display: flex; align-items: center; justify-content: center; gap: 0.75rem; cursor: pointer; box-shadow: 0 20px 40px rgba(0,0,0,0.3); transition: transform 0.15s; }
+        .btn-save-session:active { transform: scale(0.95); }
+
+        /* Sessions list */
+        .sessions-sec { padding: 0 0.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
+        .sess-header { display: flex; justify-content: space-between; align-items: center; }
+        .sess-title { font-size: 0.6875rem; font-weight: 900; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.1em; }
+        .sess-count { font-size: 0.625rem; background: rgba(255,255,255,0.1); padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 900; }
+        .sess-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .sess-item { padding: 1.25rem; border-radius: 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .si-left { overflow: hidden; flex: 1; }
+        .si-main { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.25rem; }
+        .si-date { font-weight: 900; font-size: 0.875rem; }
+        .si-sep { color: rgba(255,255,255,0.2); }
+        .si-recall { font-size: 0.875rem; }
+        .si-bark { color: #fb923c; }
+        .si-conflict { color: #fb923c; font-weight: 900; font-size: 0.625rem; }
+        .si-sub { font-size: 0.6875rem; color: rgba(255,255,255,0.6); font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .si-coords { font-size: 0.5rem; font-family: monospace; opacity: 0.4; text-transform: uppercase; margin-top: 0.15rem; }
+        .si-right { display: flex; align-items: center; gap: 0.75rem; margin-left: 0.75rem; }
+        .btn-del-sess { width: 2.5rem; height: 2.5rem; background: rgba(239,68,68,0.2); color: #f87171; border: none; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 0.875rem; }
+        .btn-del-sess:hover { background: rgba(239,68,68,0.4); }
+        .btn-del-sess:active { transform: scale(0.9); }
+        .si-exc { background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 1rem; font-weight: 900; font-size: 0.875rem; white-space: nowrap; }
+
+        /* Action buttons */
+        .action-btns { padding: 2rem 0.5rem 0; display: flex; flex-direction: column; gap: 1rem; }
+        .btn-report { width: 100%; background: white; color: #312e81; font-weight: 900; padding: 1.25rem; border-radius: 2.5rem; border: none; display: flex; align-items: center; justify-content: center; gap: 0.75rem; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 1rem; text-transform: uppercase; letter-spacing: -0.02em; transition: transform 0.15s; }
+        .btn-report:active { transform: scale(0.95); }
+        .btn-reset { width: 100%; font-weight: 900; padding: 1.25rem; border-radius: 2rem; display: flex; align-items: center; justify-content: center; gap: 0.75rem; cursor: pointer; transition: all 0.2s; border: 2px solid rgba(239,68,68,0.4); background: rgba(239,68,68,0.1); color: #f87171; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 1rem; text-transform: uppercase; }
+        .btn-reset:active { transform: scale(0.95); }
+        .btn-reset.confirm { background: #dc2626; border-color: #f87171; color: white; animation: pulse 1s infinite; }
+
+        /* Alert */
+        .alert-overlay { position: fixed; top: 10%; left: 50%; transform: translateX(-50%); z-index: 9999; pointer-events: none; width: 80%; max-width: 300px; display: none; }
+        .alert-box { background: rgba(255,255,255,0.2); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); color: white; padding: 1rem 1.25rem; border-radius: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.4); font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: center; gap: 0.75rem; border: 1px solid rgba(255,255,255,0.3); text-align: center; font-size: 0.8rem; animation: alertIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+        @keyframes alertIn { from{opacity:0;transform:translateY(-40px) scale(0.8);} to{opacity:1;transform:translateY(0) scale(1);} }
+
+        /* Report modal */
+        .modal-overlay { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 1rem; align-items: center; justify-content: center; display: none; }
+        .modal-overlay.open { display: flex; }
+        .modal-card { width: 100%; max-width: 24rem; border-radius: 2.5rem; padding: 1.5rem; box-shadow: 0 25px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 1rem; }
+        .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem; }
+        .modal-title { font-weight: 900; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; font-size: 0.75rem; letter-spacing: -0.02em; }
+        .modal-x { color: rgba(255,255,255,0.4); background: none; border: none; cursor: pointer; font-size: 1.5rem; line-height: 1; transition: color 0.2s; }
+        .modal-x:hover { color: white; }
+        .modal-body { background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 1rem; max-height: 40vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.05); }
+        .modal-pre { font-size: 0.6875rem; white-space: pre-wrap; font-family: monospace; line-height: 1.6; color: rgba(255,255,255,0.8); }
+        .modal-actions { display: flex; flex-direction: column; gap: 0.5rem; }
+        .btn-copy { width: 100%; background: rgba(255,255,255,0.1); color: white; font-weight: 700; padding: 0.75rem; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; transition: transform 0.15s; }
+        .btn-copy:active { transform: scale(0.95); }
+        .btn-share { width: 100%; background: #4f46e5; color: white; font-weight: 700; padding: 1rem; border-radius: 1rem; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; transition: transform 0.15s; }
+        .btn-share:active { transform: scale(0.95); }
     </style>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Etho-Track">
-
-<meta name="mobile-web-app-capable" content="yes">
-
-<meta name="theme-color" content="#3730a3">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' 'unsafe-eval' https://unpkg.com; style-src 'unsafe-inline'; connect-src https://api.open-meteo.com https://nominatim.openstreetmap.org; img-src 'self' data: blob:; font-src 'self'; object-src 'none'; base-uri 'self';">
 </head>
 <body>
-    <div id="root"></div>
-
-    <script type="text/babel" data-presets="react">
-        /* @jsxRuntime classic */
-        const { useState, useEffect, useRef } = React;
-
-        const Icons = {
-            ActivityLogo: (props) => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-            ),
-            ClipboardList: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1-2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
-            ),
-            MapPin: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-            ),
-            Target: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-            ),
-            Save: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            ),
-            FileText: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
-            ),
-            Play: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            ),
-            Square: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
-            ),
-            RotateCcw: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-            ),
-            Camera: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-            ),
-            Image: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-            ),
-            X: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            ),
-            Copy: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-            ),
-            Share: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-            ),
-            Volume2: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-            ),
-            Bell: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-            ),
-            Users: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            ),
-            Wind: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>
-            ),
-            Plus: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            ),
-            Minus: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            ),
-            AlertTriangle: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            ),
-            Check: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            ),
-            Link: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            ),
-            Menu: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            ),
-            Trash: (props) => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-            ),
-            RefreshCw: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 1 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
-            ),
-            Download: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            ),
-            Upload: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            )
-        };
-
-        const App = () => {
-            const [dogName, setDogName] = useState("___");
-            const [dogAge, setDogAge] = useState("");
-            const [dogBreed, setDogBreed] = useState("");
-            const [ownerName, setOwnerName] = useState("");
-            const [dogPhoto, setDogPhoto] = useState(null);
-            const [sessions, setSessions] = useState([]);
-            
-            const [savedProfiles, setSavedProfiles] = useState([]);
-            const [showProfilesMenu, setShowProfilesMenu] = useState(false);
-            const [location, setLocation] = useState("");
-            const [coords, setCoords] = useState({ lat: null, lng: null });
-            const [isGpsActive, setIsGpsActive] = useState(false);
-            const [weather, setWeather] = useState(null);
-            const [showPhotoMenu, setShowPhotoMenu] = useState(false);
-            const [formData, setFormData] = useState({
-                date: new Date().toLocaleDateString('fr-FR'),
-                environnement: 'campagne',
-                typeSortie: 'travail',
-                attache: 'libre',
-                excitation: 3,
-                aboiement: false,
-                reactionSociale: 'neutre',
-                tempsRappel: '0-5s',
-                notes: '',
-                timer: 0
-            });
-            const [showReport, setShowReport] = useState(false);
-            const [message, setMessage] = useState(null);
-            const [timer, setTimer] = useState(0);
-            const [isTimerRunning, setIsTimerRunning] = useState(false);
-            const [rappelCount, setRappelCount] = useState(0);
-            const [confirmReset, setConfirmReset] = useState(false);
-            
-            const timerRef = useRef(null);
-            const cameraInputRef = useRef(null);
-            const galleryInputRef = useRef(null);
-            const menuRef = useRef(null);
-            const jsonImportRef = useRef(null);
-
-            // Charger les profils au démarrage
-            useEffect(() => {
-                const stored = localStorage.getItem('etho_track_profiles');
-                if (stored) {
-                    setSavedProfiles(JSON.parse(stored));
-                }
-            }, []);
-
-            // Sauvegarde automatique du profil actuel dans les profils enregistrés
-            const handleSaveProfile = () => {
-                const currentProfile = {
-                    id: dogName.toLowerCase().replace(/\s/g, '-') || Date.now().toString(),
-                    name: dogName,
-                    age: dogAge,
-                    breed: dogBreed,
-                    owner: ownerName,
-                    photo: dogPhoto,
-                    sessions: sessions,
-                    lastUpdated: new Date().toISOString()
-                };
-
-                const newProfiles = [...savedProfiles.filter(p => p.id !== currentProfile.id), currentProfile];
-                setSavedProfiles(newProfiles);
-                localStorage.setItem('etho_track_profiles', JSON.stringify(newProfiles));
-                setMessage("PROFIL SAUVEGARDÉ !");
-                setTimeout(() => setMessage(null), 3000);
-            };
-
-            // --- NOUVELLES FONCTIONS DE FICHIER JSON ---
-
-            const handleExportJSON = () => {
-                const allData = {
-                    profiles: savedProfiles,
-                    currentDog: {
-                        name: dogName,
-                        age: dogAge,
-                        breed: dogBreed,
-                        owner: ownerName,
-                        photo: dogPhoto,
-                        sessions: sessions
-                    },
-                    exportDate: new Date().toISOString()
-                };
-
-                const dataStr = JSON.stringify(allData, null, 2);
-                const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-                
-                const fileName = `etho_track_backup_${dogName}_${new Date().toISOString().split('T')[0]}.json`;
-                
-                const linkElement = document.createElement('a');
-                linkElement.setAttribute('href', dataUri);
-                linkElement.setAttribute('download', fileName);
-                linkElement.click();
-                
-                setMessage("JSON EXPORTÉ");
-                setTimeout(() => setMessage(null), 3000);
-                setShowProfilesMenu(false);
-            };
-
-            const handleImportJSON = (event) => {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const json = JSON.parse(e.target.result);
-                        
-                        // Validation: profiles must be an array of objects with a string name
-                        const isValidProfile = (p) => p && typeof p === 'object' && typeof p.name === 'string';
-                        if (json.profiles && Array.isArray(json.profiles) && json.profiles.every(isValidProfile)) {
-                            setSavedProfiles(json.profiles);
-                            localStorage.setItem('etho_track_profiles', JSON.stringify(json.profiles));
-                            
-                            // Si des données actuelles sont présentes, on les charge aussi
-                            if (json.currentDog) {
-                                const d = json.currentDog;
-                                setDogName(d.name);
-                                setDogAge(d.age || "");
-                                setDogBreed(d.breed || "");
-                                setOwnerName(d.owner || "");
-                                setDogPhoto(d.photo || null);
-                                setSessions(d.sessions || []);
-                            }
-                            
-                            setMessage("DONNÉES RESTAURÉES");
-                        } else {
-                            setMessage("JSON INVALIDE");
-                        }
-                    } catch (err) {
-                        setMessage("ERREUR LECTURE");
-                    }
-                    setTimeout(() => setMessage(null), 3000);
-                };
-                reader.readAsText(file);
-                event.target.value = ''; // Reset input
-                setShowProfilesMenu(false);
-            };
-
-            // --- FIN DES FONCTIONS JSON ---
-
-            const handleLoadProfile = (profile) => {
-                setDogName(profile.name);
-                setDogAge(profile.age || "");
-                setDogBreed(profile.breed || "");
-                setOwnerName(profile.owner || "");
-                setDogPhoto(profile.photo || null);
-                setSessions(profile.sessions || []);
-                setShowProfilesMenu(false);
-                setMessage(`${profile.name} chargé`);
-                setTimeout(() => setMessage(null), 2000);
-            };
-
-            const handleDeleteProfile = (e, id) => {
-                e.stopPropagation();
-                const newProfiles = savedProfiles.filter(p => p.id !== id);
-                setSavedProfiles(newProfiles);
-                localStorage.setItem('etho_track_profiles', JSON.stringify(newProfiles));
-            };
-
-            const handleDeleteEntry = (index) => {
-                const newSessions = [...sessions];
-                newSessions.splice(index, 1);
-                setSessions(newSessions);
-                setMessage("SESSION SUPPRIMÉE");
-                setTimeout(() => setMessage(null), 2000);
-            }
-
-            const handleResetTotal = () => {
-                if (!confirmReset) {
-                    setConfirmReset(true);
-                    setMessage("CONFIRMATION REQUISE");
-                    setTimeout(() => {
-                        setConfirmReset(false);
-                        if (message === "CONFIRMATION REQUISE") setMessage(null);
-                    }, 4000);
-                    return;
-                }
-                setSessions([]);
-                setTimer(0);
-                setRappelCount(0);
-                setIsTimerRunning(false);
-                setConfirmReset(false);
-                setMessage("HISTORIQUE EFFACÉ");
-                setTimeout(() => setMessage(null), 3000);
-            };
-
-            const fetchWeather = async (lat, lon) => {
-                try {
-                    const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`);
-                    const data = await response.json();
-                    if (data.current) {
-                        setWeather({
-                            temp: Math.round(data.current.temperature_2m),
-                            wind: Math.round(data.current.wind_speed_10m),
-                            code: data.current.weather_code
-                        });
-                    }
-                } catch (e) {
-                    console.error("Météo indisponible", e);
-                }
-            };
-
-            const requestGpsAccess = () => {
-                if ("geolocation" in navigator) {
-                    setMessage("RECHERCHE GPS...");
-                    navigator.geolocation.getCurrentPosition(
-                        async (position) => {
-                            const { latitude, longitude } = position.coords;
-                            setCoords({ lat: latitude.toFixed(4), lng: longitude.toFixed(4) });
-                            fetchWeather(latitude, longitude);
-                            try {
-                                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`, { headers: { 'User-Agent': 'EthoTrack/1.0' } });
-                                const data = await response.json();
-                                const city = data.address.city || data.address.town || data.address.village || "Zone isolée";
-                                setLocation(city);
-                                setIsGpsActive(true);
-                                setMessage("POSITION TROUVÉE");
-                            } catch (error) {
-                                setLocation(`${latitude.toFixed(2)}, ${longitude.toFixed(2)}`);
-                                setIsGpsActive(true);
-                                setMessage("COORDONNÉES FIXÉES");
-                            }
-                            setTimeout(() => setMessage(null), 2000);
-                        },
-                        (error) => {
-                            setMessage(error.code === 1 ? "ACCÈS GPS REFUSÉ" : "ERREUR GPS");
-                            setIsGpsActive(false);
-                            setTimeout(() => setMessage(null), 3000);
-                        }
-                    );
-                } else {
-                    setMessage("GPS NON SUPPORTÉ");
-                    setTimeout(() => setMessage(null), 3000);
-                }
-            };
-
-            useEffect(() => {
-                if (isTimerRunning) {
-                    timerRef.current = setInterval(() => setTimer(t => t + 0.1), 100);
-                } else {
-                    clearInterval(timerRef.current);
-                }
-                return () => clearInterval(timerRef.current);
-            }, [isTimerRunning]);
-
-            const handlePhotoUpload = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    // Reset de l'input pour permettre la ré-sélection du même fichier si échec
-                    e.target.value = '';
-                    
-                    try {
-                        const img = new Image();
-                        // OPTIMISATION SAMSUNG/ANDROID : 
-                        // Utilisation de createObjectURL au lieu de FileReader pour éviter 
-                        // les crashs mémoire avec les photos haute résolution (108MP+)
-                        const objectUrl = URL.createObjectURL(file);
-                        
-                        img.onload = () => {
-                            // Création d'un canvas pour le redimensionnement
-                            const canvas = document.createElement('canvas');
-                            const MAX_WIDTH = 200;
-                            const MAX_HEIGHT = 200;
-                            let width = img.width;
-                            let height = img.height;
-
-                            // Calcul des proportions pour garder un ratio correct
-                            if (width > height) {
-                                if (width > MAX_WIDTH) {
-                                    height *= MAX_WIDTH / width;
-                                    width = MAX_WIDTH;
-                                }
-                            } else {
-                                if (height > MAX_HEIGHT) {
-                                    width *= MAX_HEIGHT / height;
-                                    height = MAX_HEIGHT;
-                                }
-                            }
-
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-
-                            // Exportation en format JPEG avec une qualité de 0.7
-                            const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                            
-                            setDogPhoto(optimizedDataUrl);
-                            setShowPhotoMenu(false);
-                            setMessage("PHOTO OPTIMISÉE");
-                            setTimeout(() => setMessage(null), 2000);
-                            
-                            // Libération de la mémoire
-                            URL.revokeObjectURL(objectUrl);
-                        };
-
-                        img.onerror = () => {
-                            setMessage("ERREUR LECTURE IMAGE");
-                            URL.revokeObjectURL(objectUrl);
-                            setTimeout(() => setMessage(null), 3000);
-                        };
-
-                        img.src = objectUrl;
-
-                    } catch (err) {
-                        console.error(err);
-                        setMessage("ERREUR TECHNIQUE");
-                        setTimeout(() => setMessage(null), 3000);
-                    }
-                }
-            };
-
-            const handleSaveSession = () => {
-                const sessionToSave = { 
-                    ...formData, 
-                    timer: timer.toFixed(1), 
-                    location,
-                    coords: coords.lat ? `${coords.lat}, ${coords.lng}` : null,
-                    rappels: rappelCount,
-                    weather: weather ? `${weather.temp}°C, vent ${weather.wind}km/h` : null
-                };
-                
-                // Création de la nouvelle liste de sessions
-                const newSessions = [sessionToSave, ...sessions];
-                setSessions(newSessions);
-
-                // --- SAUVEGARDE AUTOMATIQUE DU PROFIL ---
-                const currentProfile = {
-                    id: dogName.toLowerCase().replace(/\s/g, '-') || Date.now().toString(),
-                    name: dogName,
-                    age: dogAge,
-                    breed: dogBreed,
-                    owner: ownerName,
-                    photo: dogPhoto,
-                    sessions: newSessions, // On utilise la liste mise à jour incluant la nouvelle session
-                    lastUpdated: new Date().toISOString()
-                };
-
-                const newProfiles = [...savedProfiles.filter(p => p.id !== currentProfile.id), currentProfile];
-                setSavedProfiles(newProfiles);
-                localStorage.setItem('etho_track_profiles', JSON.stringify(newProfiles));
-                // ----------------------------------------
-
-                setMessage("SESSION SAUVEGARDÉE !");
-                setTimeout(() => setMessage(null), 3000);
-                setFormData({ ...formData, notes: '', aboiement: false, date: new Date().toLocaleDateString('fr-FR') });
-                setIsTimerRunning(false);
-                setTimer(0);
-                setRappelCount(0);
-            };
-
-            const calculateStats = () => {
-                if (sessions.length === 0) return null;
-                const avgExcitation = (sessions.reduce((acc, s) => acc + parseInt(s.excitation), 0) / sessions.length).toFixed(1);
-                const focusRate = (sessions.filter(s => s.reactionSociale === 'focusmaitre' || s.reactionSociale === 'distant' || s.reactionSociale === 'neutre').length / sessions.length * 100).toFixed(0);
-                const barkRate = (sessions.filter(s => s.aboiement).length / sessions.length * 100).toFixed(0);
-                return { avgExcitation, focusRate, barkRate };
-            };
-
-            const generateReportText = () => {
-                const targetCount = 14;
-                const sessionsToAnalyze = sessions.slice(0, targetCount);
-                if (sessionsToAnalyze.length === 0) return "Aucune session enregistrée pour le moment.";
-
-                const avgExc = (sessionsToAnalyze.reduce((acc, s) => acc + parseInt(s.excitation), 0) / sessionsToAnalyze.length).toFixed(1);
-                const barkSessionsCount = sessionsToAnalyze.filter(s => s.aboiement).length;
-                const conflictSessionsCount = sessionsToAnalyze.filter(s => s.reactionSociale === 'conflit').length;
-                const environments = [...new Set(sessionsToAnalyze.map(s => s.environnement))].join(', ');
-                
-                let text = `🐾 RAPPORT DE SUIVI : ${dogName.toUpperCase()}\n`;
-                if(dogBreed || dogAge || ownerName) {
-                    text += `${dogBreed ? `Race: ${dogBreed} | ` : ''}${dogAge ? `Âge: ${dogAge} | ` : ''}${ownerName ? `Propriétaire: ${ownerName}` : ''}\n`;
-                }
-                text += `-------------------------------------------\n`;
-                text += `Période : Analyse des ${sessionsToAnalyze.length} dernières sessions\n`;
-                text += `Lieux fréquentés : ${environments}\n`;
-                text += `Niveau d'excitation moyen : ${avgExc}/5\n`;
-                text += `Sessions avec aboiements : ${barkSessionsCount}/${sessionsToAnalyze.length}\n`;
-                if (conflictSessionsCount > 0) {
-                    text += `Épisodes de conflit : ${conflictSessionsCount}/${sessionsToAnalyze.length}\n`;
-                }
-                text += `\nOBSERVATIONS DÉTAILLÉES :\n`;
-
-                sessionsToAnalyze.forEach((s, i) => {
-                    const iconSocial = (s.reactionSociale === 'focusmaitre' || s.reactionSociale === 'distant' || s.reactionSociale === 'neutre') ? '✅' : (s.reactionSociale === 'conflit' ? '🛑' : '⚠️');
-                    const iconBark = s.aboiement ? ' 🔊 [ABOIEMENT]' : '';
-                    const attacheStr = s.attache ? ` | Attache : ${s.attache}` : '';
-                    const rappelsStr = s.rappels > 0 ? ` | Rappels : ${s.rappels}` : '';
-                    const weatherStr = s.weather ? ` (${s.weather})` : '';
-                    const coordsStr = s.coords ? ` [Géo: ${s.coords}]` : '';
-                    text += `- ${s.date}${weatherStr}${coordsStr} [${s.location || 'Inconnu'}] : ${iconSocial} Réaction : ${s.reactionSociale}${attacheStr}${iconBark}. | Rappel : ${s.tempsRappel}.${rappelsStr} ${s.notes ? 'Note : ' + s.notes : ''}\n`;
-                });
-
-                text += `\nSYNTHÈSE ÉTHOLOGIQUE :\n`;
-                const rapidRecalls = sessionsToAnalyze.filter(s => s.tempsRappel === '0-5s').length;
-                const recallRate = (rapidRecalls / sessionsToAnalyze.length * 100).toFixed(0);
-
-                if (avgExc > 3.5 || conflictSessionsCount > 2) {
-                    text += `Sur cet échantillon, on observe une réactivité ou des conflits encore fréquents. Il est vivement conseillé de réduire la difficulté des environnements. `;
-                } else if (avgExc < 2.5) {
-                    text += `${dogName} montre une belle stabilité émotionnelle sur les dernières entrées. `;
-                }
-
-                if (barkSessionsCount > (sessionsToAnalyze.length / 2)) {
-                    text += `Une forte présence d'aboiements est notée (${Math.round(barkSessionsCount/sessionsToAnalyze.length*100)}% des cas). `;
-                }
-
-                text += `Le rappel est jugé immédiat (0-5s) dans ${recallRate}% des cas observés.`;
-
-                return text;
-            };
-
-            const handleShareReport = async () => {
-                const text = generateReportText();
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: `Bilan Etho-Track - ${dogName}`,
-                            text: text
-                        });
-                    } catch (err) {
-                        console.log("Erreur partage:", err);
-                    }
-                } else {
-                    const mailtoUrl = `mailto:?subject=${encodeURIComponent(`Bilan Etho-Track - ${dogName}`)}&body=${encodeURIComponent(text)}`;
-                    window.location.href = mailtoUrl;
-                }
-            };
-
-            const stats = calculateStats();
-
-            const getWeatherEmoji = (code) => {
-                if (code === 0) return "☀️";
-                if (code <= 3) return "🌤️";
-                if (code <= 48) return "🌫️";
-                if (code <= 67) return "🌧️";
-                if (code <= 77) return "❄️";
-                if (code <= 82) return "🌦️";
-                if (code <= 99) return "⛈️";
-                return "☁️";
-            };
-
-            return (
-                <div className="max-w-md mx-auto min-h-screen pb-10 font-sans text-white relative overflow-x-hidden">
-                    <div className="fixed top-[10%] left-[-20%] w-64 h-64 bg-indigo-500/30 rounded-full blur-[100px] -z-10"></div>
-                    <div className="fixed bottom-[20%] right-[-10%] w-80 h-80 bg-purple-500/20 rounded-full blur-[120px] -z-10"></div>
-
-                    {message && (
-                        <div className="alert-overlay">
-                            <div className="alert-box">
-                                <span className="text-white"><Icons.Check /></span>
-                                <span>{message}</span>
-                            </div>
-                        </div>
-                    )}
-
-                    {showReport && (
-                        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md p-4 flex items-center justify-center">
-                            <div className="glass-card w-full max-w-sm rounded-[2.5rem] p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-300">
-                                <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                                    <h3 className="font-black glass-text flex items-center gap-2 uppercase tracking-tighter text-xs">
-                                        <Icons.FileText /> Rapport Client
-                                    </h3>
-                                    <button onClick={() => setShowReport(false)} className="text-white/40 p-1 hover:text-white transition-colors">
-                                        <Icons.X />
-                                    </button>
-                                </div>
-                                <div className="bg-black/20 p-4 rounded-2xl max-h-[40vh] overflow-y-auto border border-white/5">
-                                    <pre className="text-[11px] whitespace-pre-wrap font-mono leading-relaxed text-white/80">
-                                        {generateReportText()}
-                                    </pre>
-                                </div>
-                                <div className="grid grid-cols-1 gap-2">
-                                    <button 
-                                        onClick={async () => {
-                                            const text = generateReportText();
-                                            try {
-                                                await navigator.clipboard.writeText(text);
-                                            } catch {
-                                                const textArea = document.createElement("textarea");
-                                                textArea.value = text;
-                                                textArea.style.position = "fixed";
-                                                textArea.style.opacity = "0";
-                                                document.body.appendChild(textArea);
-                                                textArea.select();
-                                                document.execCommand('copy');
-                                                document.body.removeChild(textArea);
-                                            }
-                                            setMessage("COPIÉ DANS LE PRESSE-PAPIER");
-                                            setTimeout(() => setMessage(null), 2000);
-                                        }}
-                                        className="w-full bg-white/10 text-white font-bold py-3 rounded-2xl border border-white/20 flex items-center justify-center gap-2 active:scale-95 transition-transform"
-                                    >
-                                        <Icons.Copy /> COPIER
-                                    </button>
-                                    <button 
-                                        onClick={handleShareReport}
-                                        className="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform"
-                                    >
-                                        <Icons.Share /> ENVOYER LE BILAN
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    <header className="p-6 pt-20 flex flex-col items-center">
-                        <div className="relative z-10 text-center mb-6">
-                            <h1 className="logo-container text-4xl flex items-center justify-center italic">
-                                <Icons.ActivityLogo className="logo-icon text-green-400 mr-3" />
-                                <span className="logo-main">Etho</span>
-                                <span className="logo-separator"> – </span>
-                                <span className="logo-accent">Track</span>
-                            </h1>
-                        </div>
-                        
-                        <div className="w-full px-2 flex flex-col items-center gap-3">
-                            {!isGpsActive ? (
-                                <button 
-                                    onClick={requestGpsAccess}
-                                    className="w-full max-w-[280px] bg-green-500/80 hover:bg-green-400 text-white px-6 py-4 rounded-full backdrop-blur-md border border-white/20 flex items-center justify-center gap-2 text-xs font-black uppercase animate-pulse shadow-lg tracking-widest"
-                                >
-                                    <Icons.MapPin /> Activer le GPS
-                                </button>
-                            ) : (
-                                <div className="w-full bg-white/10 p-5 rounded-[2.5rem] backdrop-blur-md border border-white/10 flex flex-col items-center gap-3 animate-fade-in shadow-xl">
-                                    <div className="flex flex-col items-center gap-1 w-full border-b border-white/5 pb-4">
-                                        <div className="flex items-center gap-2 text-green-400">
-                                            <Icons.MapPin />
-                                            <span className="text-xl font-black uppercase tracking-widest truncate max-w-[220px]">{location}</span>
-                                        </div>
-                                        {coords.lat && (
-                                            <div className="flex items-center gap-1 opacity-50 text-[18px] font-mono mt-0.5 tracking-tighter">
-                                                <Icons.Target />
-                                                <span>LAT: {coords.lat} | LNG: {coords.lng}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    
-                                    {weather ? (
-                                        <div className="flex items-center justify-around w-full">
-                                            <div className="flex flex-col items-center">
-                                                <span className="text-2xl mb-1">{getWeatherEmoji(weather.code)}</span>
-                                                <span className="text-[10px] font-bold uppercase opacity-60">Ciel</span>
-                                            </div>
-                                            <div className="w-px h-10 bg-white/10"></div>
-                                            <div className="flex flex-col items-center">
-                                                <span className="text-xl font-black">{weather.temp}°C</span>
-                                                <span className="text-[10px] font-bold uppercase opacity-60">Temp.</span>
-                                            </div>
-                                            <div className="w-px h-10 bg-white/10"></div>
-                                            <div className="flex flex-col items-center">
-                                                <div className="flex items-center gap-1">
-                                                    <Icons.Wind />
-                                                    <span className="text-sm font-black">{weather.wind}</span>
-                                                </div>
-                                                <span className="text-[10px] font-bold uppercase opacity-60">km/h</span>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-4 py-2 animate-pulse opacity-50">
-                                            <div className="w-8 h-8 bg-white/20 rounded-full"></div>
-                                            <div className="w-24 h-4 bg-white/20 rounded-full"></div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
-                        {stats && (
-                            <div className="relative z-10 flex gap-4 mt-8 w-full px-2">
-                                <div className="bg-white/5 flex-1 p-4 rounded-[1.5rem] backdrop-blur-sm border border-white/10 text-center shadow-sm">
-                                    <p className="text-[10px] uppercase opacity-50 font-black tracking-widest mb-1">Focus Maître</p>
-                                    <p className="text-2xl font-black tracking-tighter">{stats.focusRate}%</p>
-                                </div>
-                                <div className="bg-white/5 flex-1 p-4 rounded-[1.5rem] backdrop-blur-sm border border-white/10 text-center shadow-sm">
-                                    <p className="text-[10px] uppercase opacity-50 font-black tracking-widest mb-1">Excitation</p>
-                                    <p className="text-2xl font-black tracking-tighter">{stats.avgExcitation}</p>
-                                </div>
-                            </div>
-                        )}
-                    </header>
-
-                    <main className="p-4 space-y-6 relative z-20">
-                        <div className="glass-card p-6 rounded-[2.5rem] flex flex-col items-center gap-4 relative overflow-visible z-40">
-                            <div className="absolute top-6 left-6 z-30" ref={menuRef}>
-                                <button 
-                                    onClick={() => setShowProfilesMenu(!showProfilesMenu)}
-                                    className="p-2 text-white/50 hover:text-white transition-colors"
-                                >
-                                    <Icons.Menu />
-                                </button>
-                                {showProfilesMenu && (
-                                    <div className="absolute top-10 left-0 w-72 burger-menu-content rounded-3xl shadow-2xl py-3 menu-appear z-50">
-                                        <div className="px-4 pb-2 border-b border-white/10 mb-2 flex justify-between items-center">
-                                            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Options & Profils</span>
-                                            <button onClick={() => setShowProfilesMenu(false)}><Icons.X className="w-4 h-4 text-white/20" /></button>
-                                        </div>
-
-                                        {/* SECTION JSON - NOUVEAU */}
-                                        <div className="px-4 py-3 grid grid-cols-2 gap-2 border-b border-white/10 mb-2">
-                                            <button 
-                                                onClick={handleExportJSON}
-                                                className="bg-indigo-500/20 hover:bg-indigo-500/40 border border-indigo-400/30 py-3 rounded-xl flex flex-col items-center gap-1 transition-all"
-                                            >
-                                                <Icons.Download />
-                                                <span className="text-[8px] font-black uppercase tracking-tighter text-indigo-200">Exporter JSON</span>
-                                            </button>
-                                            <button 
-                                                onClick={() => jsonImportRef.current.click()}
-                                                className="bg-green-500/20 hover:bg-green-500/40 border border-green-400/30 py-3 rounded-xl flex flex-col items-center gap-1 transition-all"
-                                            >
-                                                <Icons.Upload />
-                                                <span className="text-[8px] font-black uppercase tracking-tighter text-green-200">Importer JSON</span>
-                                            </button>
-                                            <input 
-                                                type="file" 
-                                                ref={jsonImportRef} 
-                                                onChange={handleImportJSON} 
-                                                className="hidden" 
-                                                accept=".json" 
-                                            />
-                                        </div>
-
-                                        {savedProfiles.length === 0 ? (
-                                            <div className="px-4 py-4 text-xs italic text-white/30">Aucun profil sauvegardé</div>
-                                        ) : (
-                                            <div className="max-h-60 overflow-y-auto custom-scroll">
-                                                {savedProfiles.map(p => (
-                                                    <div 
-                                                        key={p.id} 
-                                                        onClick={() => handleLoadProfile(p)}
-                                                        className="group px-4 py-3 hover:bg-white/10 cursor-pointer flex justify-between items-center transition-all"
-                                                    >
-                                                        <div className="flex flex-col">
-                                                            <span className="font-bold text-sm text-white">{p.name}</span>
-                                                            <span className="text-[10px] text-white/40">{p.breed || 'Sans race'} • {p.sessions.length} sessions</span>
-                                                        </div>
-                                                        <button 
-                                                            onClick={(e) => handleDeleteProfile(e, p.id)}
-                                                            className="p-2 text-white/20 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
-                                                        >
-                                                            <Icons.Trash />
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-
-                            <button 
-                                onClick={handleSaveProfile}
-                                className="absolute top-6 right-6 p-2 text-white/50 hover:text-green-400 transition-colors z-30 active:scale-90"
-                            >
-                                <Icons.Save />
-                            </button>
-
-                            <div className="relative w-32 h-32 mt-4">
-                                <button 
-                                    onClick={() => setShowPhotoMenu(!showPhotoMenu)} 
-                                    className="w-full h-full rounded-full overflow-hidden bg-white/10 border-4 border-white/20 shadow-md flex items-center justify-center transition-all hover:scale-105 active:scale-95 group focus:outline-none"
-                                >
-                                    {dogPhoto ? (
-                                        <img src={dogPhoto} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <div className="flex flex-col items-center gap-1">
-                                            <span className="text-4xl">🐕</span>
-                                            <span className="text-[8px] font-black glass-label uppercase tracking-tighter">Ajouter photo</span>
-                                        </div>
-                                    )}
-                                </button>
-
-                                {showPhotoMenu && (
-                                    <div className="absolute top-[80%] left-1/2 -translate-x-1/2 mt-2 w-48 bg-indigo-900 border border-white/10 rounded-2xl shadow-xl py-2 z-40">
-                                        <button onClick={() => { cameraInputRef.current.click(); setShowPhotoMenu(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-white hover:bg-white/10">
-                                            <Icons.Camera /> Appareil photo
-                                        </button>
-                                        <button onClick={() => { galleryInputRef.current.click(); setShowPhotoMenu(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-white hover:bg-white/10 border-t border-white/5">
-                                            <Icons.Image /> Galerie
-                                        </button>
-                                    </div>
-                                )}
-                                <input type="file" ref={cameraInputRef} onChange={handlePhotoUpload} accept="image/*" capture="environment" className="hidden" />
-                                <input type="file" ref={galleryInputRef} onChange={handlePhotoUpload} accept="image/*" className="hidden" />
-                            </div>
-                            
-                            <div className="w-full space-y-3">
-                                <input type="text" value={dogName} onChange={(e) => setDogName(e.target.value)} className="text-2xl font-black glass-text border-none bg-transparent text-center focus:ring-0 w-full" />
-                                
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div className="flex flex-col items-center">
-                                        <label className="text-[9px] font-bold glass-label uppercase tracking-wider mb-1">Âge</label>
-                                        <input 
-                                            type="text" 
-                                            value={dogAge} 
-                                            onChange={(e) => setDogAge(e.target.value)} 
-                                            placeholder="-"
-                                            className="text-sm font-bold glass-text border-none bg-white/5 rounded-xl text-center focus:ring-0 w-full py-2 placeholder-white/20" 
-                                        />
-                                    </div>
-                                    <div className="flex flex-col items-center">
-                                        <label className="text-[9px] font-bold glass-label uppercase tracking-wider mb-1">Race</label>
-                                        <input 
-                                            type="text" 
-                                            value={dogBreed} 
-                                            onChange={(e) => setDogBreed(e.target.value)} 
-                                            placeholder="-"
-                                            className="text-sm font-bold glass-text border-none bg-white/5 rounded-xl text-center focus:ring-0 w-full py-2 placeholder-white/20" 
-                                        />
-                                    </div>
-                                    <div className="flex flex-col items-center">
-                                        <label className="text-[9px] font-bold glass-label uppercase tracking-wider mb-1">Proprio</label>
-                                        <input 
-                                            type="text" 
-                                            value={ownerName} 
-                                            onChange={(e) => setOwnerName(e.target.value)} 
-                                            placeholder="-"
-                                            className="text-sm font-bold glass-text border-none bg-white/5 rounded-xl text-center focus:ring-0 w-full py-2 placeholder-white/20" 
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="glass-card p-6 rounded-[2.5rem] space-y-6">
-                            <h2 className="glass-text font-black flex items-center gap-2 border-b border-white/10 pb-4 uppercase text-sm tracking-widest">
-                                <Icons.ClipboardList /> Saisie Terrain
-                            </h2>
-                            
-                            <div className="grid grid-cols-1 gap-5">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black glass-label uppercase px-1">Choix du Milieu</label>
-                                    <select 
-                                        value={formData.environnement} 
-                                        onChange={(e) => setFormData({...formData, environnement: e.target.value})} 
-                                        className="w-full p-5 bg-white/5 border-2 border-white/10 rounded-3xl text-lg outline-none font-bold glass-text focus:border-white/20 transition-all appearance-none"
-                                        style={{backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem center', backgroundSize: '1.5em'}}
-                                    >
-                                        <option value="campagne" className="bg-indigo-900">🏞️ Campagne</option>
-                                        <option value="ville" className="bg-indigo-900">🏙️ Ville</option>
-                                        <option value="foret" className="bg-indigo-900">🌲 Forêt</option>
-                                        <option value="montagne" className="bg-indigo-900">⛰️ Montagne</option>
-                                        <option value="plage" className="bg-indigo-900">🏖️ Plage</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black glass-label uppercase px-1">Activité en cours</label>
-                                    <select 
-                                        value={formData.typeSortie} 
-                                        onChange={(e) => setFormData({...formData, typeSortie: e.target.value})} 
-                                        className="w-full p-5 bg-white/5 border-2 border-white/10 rounded-3xl text-lg outline-none font-bold glass-text focus:border-white/20 transition-all appearance-none"
-                                        style={{backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem center', backgroundSize: '1.5em'}}
-                                    >
-                                        <option value="travail" className="bg-indigo-900">🎯 Recherche</option>
-                                        <option value="mulotage" className="bg-indigo-900">🐭 Mulotage</option>
-                                        <option value="balade" className="bg-indigo-900">🦮 Balade</option>
-                                        <option value="social" className="bg-indigo-900">🤝 Social</option>
-                                        <option value="course" className="bg-indigo-900">🏃 Course</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="space-y-3 p-5 bg-white/5 rounded-3xl border border-white/10">
-                                <label className="text-xs font-black glass-text uppercase flex items-center gap-2 mb-2 px-1">
-                                    <Icons.Link /> Type d'attache
-                                </label>
-                                <div className="grid grid-cols-3 gap-3">
-                                    {['libre', 'laisse', 'longe'].map((type) => (
-                                        <button
-                                            key={type}
-                                            onClick={() => setFormData({...formData, attache: type})}
-                                            className={`py-4 rounded-2xl font-black text-xs uppercase transition-all border active:scale-95 ${
-                                                formData.attache === type 
-                                                ? 'bg-white text-indigo-900 border-white shadow-lg' 
-                                                : 'bg-white/5 border-white/10 text-white/40'
-                                            }`}
-                                        >
-                                            {type}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="space-y-2 p-5 bg-white/5 rounded-3xl border border-white/10">
-                                <label className="text-xs font-black glass-text uppercase flex items-center gap-2 mb-2 px-1">
-                                    <Icons.Users /> Réaction Sociale
-                                </label>
-                                <select 
-                                    value={formData.reactionSociale} 
-                                    onChange={(e) => setFormData({...formData, reactionSociale: e.target.value})} 
-                                    className="w-full p-5 bg-white/10 border-2 border-white/10 rounded-2xl font-black text-lg glass-text outline-none focus:ring-4 focus:ring-white/5 transition-all appearance-none shadow-sm"
-                                    style={{backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'3\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem center', backgroundSize: '1.5em'}}
-                                >
-                                    <option value="neutre" className="bg-indigo-900">⚖️ Neutre</option>
-                                    <option value="focusmaitre" className="bg-indigo-900">😐 Focus Maître</option>
-                                    <option value="distant" className="bg-indigo-900">🍃 Distant</option>
-                                    <option value="vigilance" className="bg-indigo-900">🧐 Vigilance</option>
-                                    <option value="tension" className="bg-indigo-900">🐕 Tension laisse</option>
-                                    <option value="contact" className="bg-indigo-900">🚀 Contact direct</option>
-                                    <option value="conflit" className="bg-indigo-900 text-orange-400">🛑 Conflit</option>
-                                </select>
-                            </div>
-
-                            <div className="flex flex-col gap-4 bg-black/20 p-6 rounded-[2.5rem] border border-white/5 shadow-inner">
-                                <div className="flex items-center justify-between gap-6">
-                                    <div className="flex-1 space-y-1">
-                                        <span className="text-[11px] font-bold glass-label block uppercase tracking-wider">Chronomètre</span>
-                                        <div className="text-4xl font-mono font-black glass-text leading-none">
-                                            {timer.toFixed(1)}<span className="text-xl">s</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-2 items-center">
-                                        <button 
-                                            onClick={() => setIsTimerRunning(!isTimerRunning)} 
-                                            className={`w-20 h-20 rounded-2xl shadow-lg flex items-center justify-center transition-all active:scale-90 ${isTimerRunning ? 'bg-red-500 text-white' : 'bg-green-400 text-indigo-900'}`}
-                                        >
-                                            {isTimerRunning ? <Icons.Square /> : <Icons.Play />}
-                                        </button>
-                                        <button 
-                                            onClick={() => {setIsTimerRunning(false); setTimer(0)}} 
-                                            className="w-16 h-16 bg-white/10 text-white rounded-2xl border border-white/20 shadow-sm flex items-center justify-center active:scale-90"
-                                        >
-                                            <Icons.RotateCcw />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="h-px bg-white/10 w-full"></div>
-
-                                <div className="flex items-center justify-between">
-                                    <div className="space-y-1">
-                                        <span className="text-[11px] font-bold glass-label block uppercase tracking-wider">Nombre de rappels</span>
-                                        <div className="text-4xl font-black glass-text leading-none">
-                                            {rappelCount}
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <button 
-                                            onClick={() => setRappelCount(prev => Math.max(0, prev - 1))}
-                                            className="w-16 h-16 bg-white/10 text-white rounded-2xl border border-white/20 flex items-center justify-center active:scale-90"
-                                        >
-                                            <Icons.Minus />
-                                        </button>
-                                        <button 
-                                            onClick={() => setRappelCount(prev => prev + 1)}
-                                            className="w-20 h-20 bg-green-400 text-indigo-900 rounded-2xl shadow-xl flex items-center justify-center active:scale-95"
-                                        >
-                                            <Icons.Plus />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-3 p-4 bg-white/5 rounded-2xl border border-white/10">
-                                <label className="text-[10px] font-bold glass-label uppercase flex items-center gap-1">
-                                    <Icons.Bell /> Délai de réponse au rappel
-                                </label>
-                                <div className="grid grid-cols-3 gap-3">
-                                    {[
-                                        { label: '0-5s', color: 'bg-green-500' },
-                                        { label: '5-10s', color: 'bg-orange-500' },
-                                        { label: '10-20s', color: 'bg-red-500' }
-                                    ].map((val) => {
-                                        const isActive = formData.tempsRappel === val.label;
-                                        return (
-                                            <button
-                                                key={val.label}
-                                                onClick={() => setFormData({...formData, tempsRappel: val.label})}
-                                                className={`py-4 text-sm font-black rounded-2xl border transition-all active:scale-95 ${
-                                                    isActive 
-                                                    ? `${val.color} text-white border-white shadow-lg` 
-                                                    : 'bg-white/5 text-white/40 border-white/10'
-                                                }`}
-                                            >
-                                                {val.label}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-
-                            <div className="space-y-6 py-4">
-                                <div className="space-y-4">
-                                    <label className="text-xs font-black glass-text uppercase flex justify-between px-1">
-                                        Niveau d'excitation <span className="text-white text-lg">{formData.excitation}/5</span>
-                                    </label>
-                                    <div className="relative px-2">
-                                        <input 
-                                            type="range" 
-                                            min="1" 
-                                            max="5" 
-                                            step="1"
-                                            value={formData.excitation} 
-                                            onChange={(e) => setFormData({...formData, excitation: e.target.value})} 
-                                            className="w-full h-5 bg-white/10 rounded-full appearance-none cursor-pointer"
-                                        />
-                                        <div className="flex justify-between mt-2 px-1 text-[10px] font-bold glass-label">
-                                            <span>CALME</span>
-                                            <span>PIC</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="pt-2">
-                                    <button 
-                                        onClick={() => setFormData({...formData, aboiement: !formData.aboiement})}
-                                        className={`w-full py-5 rounded-3xl flex items-center justify-center gap-3 font-black text-lg transition-all duration-300 border-2 active:scale-[0.98] ${formData.aboiement ? 'bg-orange-500 border-orange-400 text-white shadow-lg' : 'bg-white/5 border-white/10 text-white/40'}`}
-                                    >
-                                        <div className={`${formData.aboiement ? 'animate-bounce' : ''}`}>
-                                            <Icons.Volume2 />
-                                        </div>
-                                        {formData.aboiement ? 'ABOIEMENT : OUI' : 'ABOIEMENT : NON'}
-                                        {formData.aboiement && <Icons.AlertTriangle />}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <textarea 
-                                value={formData.notes} 
-                                onChange={(e) => setFormData({...formData, notes: e.target.value})} 
-                                placeholder="Notes de session..." 
-                                className="w-full p-5 bg-white/5 rounded-[2rem] text-sm h-32 outline-none resize-none border border-white/10 focus:border-white/30 focus:bg-white/10 glass-text transition-all font-medium placeholder-white/20"
-                            ></textarea>
-
-                            <button 
-                                onClick={handleSaveSession} 
-                                className="w-full bg-green-500 text-white font-black text-xl py-7 rounded-[2.5rem] shadow-2xl flex items-center justify-center gap-3 active:scale-95 transition-all"
-                            >
-                                <Icons.Save /> ENREGISTRER SESSION
-                            </button>
-                        </div>
-
-                        {sessions.length > 0 && (
-                            <div className="space-y-3 px-1">
-                                <div className="flex justify-between items-center">
-                                    <h3 className="text-[11px] font-black glass-label uppercase tracking-widest">Dernières sessions</h3>
-                                    <span className="text-[10px] bg-white/10 px-3 py-1 rounded-full glass-text font-black">{Math.min(sessions.length, 14)}</span>
-                                </div>
-                                <div className="space-y-3">
-                                    {sessions.slice(0, 14).map((s, i) => (
-                                        <div key={i} className="glass-card p-5 rounded-[2rem] shadow-sm flex justify-between items-center animate-in slide-in-from-bottom-2 duration-300">
-                                            <div className="overflow-hidden space-y-1">
-                                                <div className="flex items-center gap-2">
-                                                    <p className="font-black text-sm glass-text leading-tight">
-                                                        {s.date} <span className="text-white/20 mx-1">|</span> {s.tempsRappel}
-                                                    </p>
-                                                    {s.aboiement && <span className="text-orange-400"><Icons.Volume2 /></span>}
-                                                    {s.reactionSociale === 'conflit' && <span className="text-orange-400 font-black text-[10px]">🛑 CONFLIT</span>}
-                                                </div>
-                                                <p className="text-[11px] glass-label font-bold uppercase truncate">
-                                                    {s.weather ? `${s.weather} • ` : ''}{s.location || s.environnement} • {s.attache} • {s.rappels} rappel{s.rappels > 1 ? 's' : ''}
-                                                </p>
-                                                {s.coords && <p className="text-[8px] font-mono opacity-40 uppercase">{s.coords}</p>}
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <button 
-                                                    onClick={() => handleDeleteEntry(i)} 
-                                                    className="w-10 h-10 bg-red-500/20 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-500/40 transition-colors active:scale-90" 
-                                                    aria-label="Supprimer"
-                                                >
-                                                    <Icons.Trash width={20} height={20} />
-                                                </button>
-                                                <div className="bg-white/20 px-4 py-2 rounded-2xl glass-text font-black text-sm shadow-sm">
-                                                    {s.excitation}/5
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="pt-8 px-2 text-center flex flex-col gap-4">
-                             <button 
-                                onClick={() => setShowReport(true)}
-                                className="w-full bg-white text-indigo-900 font-black py-5 rounded-[2.5rem] shadow-lg flex items-center justify-center gap-3 active:scale-95 transition-all uppercase tracking-tighter"
-                            >
-                                <Icons.FileText /> GÉNÉRER LE BILAN
-                            </button>
-                            
-                            <button 
-                                onClick={handleResetTotal}
-                                className={`mt-4 w-full font-black py-5 rounded-[2rem] flex items-center justify-center gap-3 transition-all active:scale-95 border-2 shadow-xl ${confirmReset ? 'bg-red-600 border-red-400 text-white animate-pulse' : 'bg-red-500/10 border-red-500/40 text-red-500 hover:bg-red-500/20'}`}
-                            >
-                                <Icons.RotateCcw /> {confirmReset ? "CONFIRMER L'EFFACEMENT ?" : "RESET DES SESSIONS"}
-                            </button>
-                        </div>
-                    </main>
+    <!-- Alert -->
+    <div id="alert-overlay" class="alert-overlay">
+        <div class="alert-box"><span>✓</span><span id="alert-text"></span></div>
+    </div>
+
+    <!-- Report modal -->
+    <div id="report-modal" class="modal-overlay">
+        <div class="glass modal-card">
+            <div class="modal-head">
+                <h3 class="modal-title">📋 Rapport Client</h3>
+                <button class="modal-x" id="modal-close-btn">✕</button>
+            </div>
+            <div class="modal-body"><pre id="report-text" class="modal-pre"></pre></div>
+            <div class="modal-actions">
+                <button class="btn-copy" id="copy-btn">📋 COPIER</button>
+                <button class="btn-share" id="share-btn">📤 ENVOYER LE BILAN</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app">
+        <div class="bg-orb-1"></div>
+        <div class="bg-orb-2"></div>
+
+        <header>
+            <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="logo-icon"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                <span class="logo-main">Etho</span><span class="logo-sep"> – </span><span class="logo-accent">Track</span>
+            </div>
+
+            <div id="gps-widget">
+                <button class="gps-btn" id="gps-btn">📍 Activer le GPS</button>
+            </div>
+
+            <div id="stats-widget">
+                <div class="stats-row">
+                    <div class="stat-card"><div class="stat-lbl">Focus Maître</div><div class="stat-val" id="stat-focus">—</div></div>
+                    <div class="stat-card"><div class="stat-lbl">Excitation</div><div class="stat-val" id="stat-exc">—</div></div>
                 </div>
-            );
-        };
+            </div>
+        </header>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+        <main>
+            <!-- Profile card -->
+            <div class="glass profile-card">
+                <div class="menu-anchor">
+                    <button class="burger-btn" id="burger-btn">☰</button>
+                    <div id="profiles-dropdown" class="profiles-dropdown">
+                        <div class="dd-head">
+                            <span class="dd-title">Options &amp; Profils</span>
+                            <button class="dd-close" id="dd-close-btn">✕</button>
+                        </div>
+                        <div class="json-btns">
+                            <button class="json-btn" id="export-btn"><span class="json-icon">⬇</span>Exporter JSON</button>
+                            <button class="json-btn import" id="import-btn"><span class="json-icon">⬆</span>Importer JSON</button>
+                            <input type="file" id="json-file" accept=".json" style="display:none">
+                        </div>
+                        <div id="profile-list" class="profile-list">
+                            <div class="no-profiles">Aucun profil sauvegardé</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="save-profile-btn" id="save-profile-btn">💾</button>
+
+                <div class="photo-wrapper">
+                    <button class="photo-btn" id="photo-btn">
+                        <div id="photo-display">
+                            <div class="photo-placeholder">🐕</div>
+                            <div class="photo-lbl">Ajouter photo</div>
+                        </div>
+                    </button>
+                    <div id="photo-menu" class="photo-menu">
+                        <button class="pm-btn" id="camera-btn">📷 Appareil photo</button>
+                        <button class="pm-btn" id="gallery-btn">🖼 Galerie</button>
+                    </div>
+                    <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none">
+                    <input type="file" id="gallery-input" accept="image/*" style="display:none">
+                </div>
+
+                <div class="profile-fields">
+                    <input type="text" id="dog-name" value="___" class="dog-name-input" placeholder="Nom du chien">
+                    <div class="profile-grid">
+                        <div class="pfield"><span class="pfield-lbl">Âge</span><input type="text" id="dog-age" class="pfield-input" placeholder="-"></div>
+                        <div class="pfield"><span class="pfield-lbl">Race</span><input type="text" id="dog-breed" class="pfield-input" placeholder="-"></div>
+                        <div class="pfield"><span class="pfield-lbl">Proprio</span><input type="text" id="owner-name" class="pfield-input" placeholder="-"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session form -->
+            <div class="glass form-card">
+                <h2 class="form-title">📋 Saisie Terrain</h2>
+
+                <div>
+                    <div class="slbl">Choix du Milieu</div>
+                    <select id="sel-env" class="glass-select">
+                        <option value="campagne">🏞️ Campagne</option>
+                        <option value="ville">🏙️ Ville</option>
+                        <option value="foret">🌲 Forêt</option>
+                        <option value="montagne">⛰️ Montagne</option>
+                        <option value="plage">🏖️ Plage</option>
+                    </select>
+                </div>
+
+                <div>
+                    <div class="slbl">Activité en cours</div>
+                    <select id="sel-type" class="glass-select">
+                        <option value="travail">🎯 Recherche</option>
+                        <option value="mulotage">🐭 Mulotage</option>
+                        <option value="balade">🦮 Balade</option>
+                        <option value="social">🤝 Social</option>
+                        <option value="course">🏃 Course</option>
+                    </select>
+                </div>
+
+                <div class="attache-box">
+                    <div class="slbl">🔗 Type d'attache</div>
+                    <div class="btn-group" id="attache-group">
+                        <button class="tag-btn active" data-val="libre">Libre</button>
+                        <button class="tag-btn" data-val="laisse">Laisse</button>
+                        <button class="tag-btn" data-val="longe">Longe</button>
+                    </div>
+                </div>
+
+                <div class="social-box">
+                    <div class="slbl">👥 Réaction Sociale</div>
+                    <select id="sel-social" class="glass-select" style="background-color:rgba(255,255,255,0.1)">
+                        <option value="neutre">⚖️ Neutre</option>
+                        <option value="focusmaitre">😐 Focus Maître</option>
+                        <option value="distant">🍃 Distant</option>
+                        <option value="vigilance">🧐 Vigilance</option>
+                        <option value="tension">🐕 Tension laisse</option>
+                        <option value="contact">🚀 Contact direct</option>
+                        <option value="conflit">🛑 Conflit</option>
+                    </select>
+                </div>
+
+                <div class="timer-section">
+                    <div class="timer-row">
+                        <div class="timer-left">
+                            <span class="sub-lbl">Chronomètre</span>
+                            <div class="timer-val"><span id="timer-display">0.0</span><span class="timer-unit">s</span></div>
+                        </div>
+                        <div class="timer-controls">
+                            <button id="timer-btn" class="btn-play start">▶</button>
+                            <button id="timer-reset-btn" class="btn-sm">↺</button>
+                        </div>
+                    </div>
+                    <div class="timer-div"></div>
+                    <div class="rappel-row">
+                        <div class="timer-left">
+                            <span class="sub-lbl">Nombre de rappels</span>
+                            <div class="rappel-val"><span id="rappel-count">0</span></div>
+                        </div>
+                        <div class="rappel-controls">
+                            <button id="rappel-minus" class="btn-sm">−</button>
+                            <button id="rappel-plus" class="btn-plus">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recall-box">
+                    <div class="slbl" style="margin-bottom:0.75rem">🔔 Délai de réponse au rappel</div>
+                    <div class="recall-grid" id="recall-group">
+                        <button class="recall-btn r-green" data-val="0-5s">0-5s</button>
+                        <button class="recall-btn" data-val="5-10s">5-10s</button>
+                        <button class="recall-btn" data-val="10-20s">10-20s</button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="exc-header">
+                        <span>Niveau d'excitation</span>
+                        <span class="exc-level"><span id="exc-val">3</span>/5</span>
+                    </div>
+                    <input type="range" id="exc-slider" min="1" max="5" step="1" value="3">
+                    <div class="slider-labels"><span>CALME</span><span>PIC</span></div>
+                </div>
+
+                <button id="bark-btn" class="bark-btn off">
+                    <span id="bark-icon">🔊</span>
+                    <span id="bark-text">ABOIEMENT : NON</span>
+                </button>
+
+                <textarea id="notes" class="notes-ta" placeholder="Notes de session..."></textarea>
+
+                <button id="save-session-btn" class="btn-save-session">💾 ENREGISTRER SESSION</button>
+            </div>
+
+            <!-- Sessions list -->
+            <div id="sessions-section" style="display:none">
+                <div class="sessions-sec">
+                    <div class="sess-header">
+                        <span class="sess-title">Dernières sessions</span>
+                        <span class="sess-count" id="sess-count">0</span>
+                    </div>
+                    <div id="sess-list" class="sess-list"></div>
+                </div>
+            </div>
+
+            <div class="action-btns">
+                <button id="report-btn" class="btn-report">📊 GÉNÉRER LE BILAN</button>
+                <button id="reset-btn" class="btn-reset">↺ RESET DES SESSIONS</button>
+            </div>
+        </main>
+    </div>
+
+<script>
+'use strict';
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+const S = {
+    dogPhoto: null,
+    sessions: [],
+    savedProfiles: [],
+    location: '',
+    coords: { lat: null, lng: null },
+    isGpsActive: false,
+    weather: null,
+    attache: 'libre',
+    recall: '0-5s',
+    excitation: 3,
+    aboiement: false,
+    timer: 0,
+    timerRunning: false,
+    timerInterval: null,
+    rappelCount: 0,
+    confirmReset: false,
+    confirmTimeout: null,
+    msgTimeout: null
+};
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const stored = localStorage.getItem('etho_track_profiles');
+        if (stored) { S.savedProfiles = JSON.parse(stored); renderProfileList(); }
+    } catch(e) {}
+
+    // GPS
+    document.getElementById('gps-btn').addEventListener('click', requestGps);
+
+    // Profile menu
+    document.getElementById('burger-btn').addEventListener('click', e => { e.stopPropagation(); toggleDropdown(); });
+    document.getElementById('dd-close-btn').addEventListener('click', closeDropdown);
+    document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
+    document.getElementById('export-btn').addEventListener('click', exportJSON);
+    document.getElementById('import-btn').addEventListener('click', () => document.getElementById('json-file').click());
+    document.getElementById('json-file').addEventListener('change', importJSON);
+
+    // Profile list delegation
+    document.getElementById('profile-list').addEventListener('click', e => {
+        const delBtn = e.target.closest('.pi-del');
+        const item = e.target.closest('.profile-item');
+        if (delBtn) { e.stopPropagation(); deleteProfile(delBtn.dataset.id); }
+        else if (item) { loadProfile(item.dataset.id); }
+    });
+
+    // Photo
+    document.getElementById('photo-btn').addEventListener('click', e => { e.stopPropagation(); togglePhotoMenu(); });
+    document.getElementById('camera-btn').addEventListener('click', () => { document.getElementById('camera-input').click(); closePhotoMenu(); });
+    document.getElementById('gallery-btn').addEventListener('click', () => { document.getElementById('gallery-input').click(); closePhotoMenu(); });
+    document.getElementById('camera-input').addEventListener('change', handlePhoto);
+    document.getElementById('gallery-input').addEventListener('change', handlePhoto);
+
+    // Form
+    document.getElementById('attache-group').addEventListener('click', e => {
+        const btn = e.target.closest('.tag-btn');
+        if (!btn) return;
+        S.attache = btn.dataset.val;
+        document.querySelectorAll('#attache-group .tag-btn').forEach(b => b.classList.toggle('active', b === btn));
+    });
+    document.getElementById('recall-group').addEventListener('click', e => {
+        const btn = e.target.closest('.recall-btn');
+        if (!btn) return;
+        S.recall = btn.dataset.val;
+        const cls = { '0-5s': 'r-green', '5-10s': 'r-orange', '10-20s': 'r-red' };
+        document.querySelectorAll('#recall-group .recall-btn').forEach(b => {
+            b.className = 'recall-btn' + (b === btn ? ' ' + cls[S.recall] : '');
+        });
+    });
+    document.getElementById('exc-slider').addEventListener('input', e => {
+        S.excitation = parseInt(e.target.value);
+        document.getElementById('exc-val').textContent = S.excitation;
+    });
+    document.getElementById('bark-btn').addEventListener('click', toggleBark);
+
+    // Timer
+    document.getElementById('timer-btn').addEventListener('click', toggleTimer);
+    document.getElementById('timer-reset-btn').addEventListener('click', resetTimer);
+    document.getElementById('rappel-minus').addEventListener('click', () => {
+        S.rappelCount = Math.max(0, S.rappelCount - 1);
+        document.getElementById('rappel-count').textContent = S.rappelCount;
+    });
+    document.getElementById('rappel-plus').addEventListener('click', () => {
+        S.rappelCount++;
+        document.getElementById('rappel-count').textContent = S.rappelCount;
+    });
+
+    // Session
+    document.getElementById('save-session-btn').addEventListener('click', saveSession);
+
+    // Report
+    document.getElementById('report-btn').addEventListener('click', openReport);
+    document.getElementById('modal-close-btn').addEventListener('click', closeReport);
+    document.getElementById('copy-btn').addEventListener('click', copyReport);
+    document.getElementById('share-btn').addEventListener('click', shareReport);
+
+    // Reset
+    document.getElementById('reset-btn').addEventListener('click', resetSessions);
+
+    // Close menus on outside click
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.menu-anchor')) closeDropdown();
+        if (!e.target.closest('.photo-wrapper')) closePhotoMenu();
+    });
+});
+
+// ── ALERT ──────────────────────────────────────────────────────────────────
+function showMsg(msg) {
+    const el = document.getElementById('alert-overlay');
+    document.getElementById('alert-text').textContent = msg;
+    el.style.display = 'block';
+    if (S.msgTimeout) clearTimeout(S.msgTimeout);
+    S.msgTimeout = setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+
+// ── GPS ────────────────────────────────────────────────────────────────────
+function requestGps() {
+    if (!('geolocation' in navigator)) { showMsg('GPS NON SUPPORTÉ'); return; }
+    showMsg('RECHERCHE GPS...');
+    navigator.geolocation.getCurrentPosition(async pos => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        S.coords = { lat: lat.toFixed(4), lng: lon.toFixed(4) };
+        fetchWeather(lat, lon);
+        try {
+            const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, { headers: { 'User-Agent': 'EthoTrack/1.0' } });
+            const d = await r.json();
+            S.location = d.address.city || d.address.town || d.address.village || 'Zone isolée';
+            S.isGpsActive = true; renderGps(); showMsg('POSITION TROUVÉE');
+        } catch {
+            S.location = `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+            S.isGpsActive = true; renderGps(); showMsg('COORDONNÉES FIXÉES');
+        }
+    }, err => { showMsg(err.code === 1 ? 'ACCÈS GPS REFUSÉ' : 'ERREUR GPS'); });
+}
+
+async function fetchWeather(lat, lon) {
+    try {
+        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&timezone=auto`);
+        const d = await r.json();
+        if (d.current) {
+            S.weather = { temp: Math.round(d.current.temperature_2m), wind: Math.round(d.current.wind_speed_10m), code: d.current.weather_code };
+            renderGps();
+        }
+    } catch {}
+}
+
+function wxEmoji(c) {
+    if (c === 0) return '☀️';
+    if (c <= 3) return '🌤️';
+    if (c <= 48) return '🌫️';
+    if (c <= 67) return '🌧️';
+    if (c <= 77) return '❄️';
+    if (c <= 82) return '🌦️';
+    if (c <= 99) return '⛈️';
+    return '☁️';
+}
+
+function renderGps() {
+    const w = document.getElementById('gps-widget');
+    if (!S.isGpsActive) {
+        w.innerHTML = '<button class="gps-btn" id="gps-btn">📍 Activer le GPS</button>';
+        document.getElementById('gps-btn').addEventListener('click', requestGps);
+        return;
+    }
+    const wx = S.weather
+        ? `<div class="weather-row">
+            <div class="weather-item"><div class="weather-emoji">${wxEmoji(S.weather.code)}</div><div class="weather-lbl">Ciel</div></div>
+            <div class="weather-div"></div>
+            <div class="weather-item"><div class="weather-val">${S.weather.temp}°C</div><div class="weather-lbl">Temp.</div></div>
+            <div class="weather-div"></div>
+            <div class="weather-item"><div class="weather-val">🌬 ${S.weather.wind}</div><div class="weather-lbl">km/h</div></div>
+           </div>`
+        : '<div style="opacity:0.5;font-size:0.75rem;padding:0.5rem">Météo en cours...</div>';
+    w.innerHTML = `<div class="gps-card">
+        <div class="gps-location">
+            <div class="gps-city"><span>📍</span><span>${h(S.location)}</span></div>
+            ${S.coords.lat ? `<div class="gps-coords">🎯 LAT: ${S.coords.lat} | LNG: ${S.coords.lng}</div>` : ''}
+        </div>
+        ${wx}
+    </div>`;
+}
+
+// ── PROFILE MENU ───────────────────────────────────────────────────────────
+function toggleDropdown() { document.getElementById('profiles-dropdown').classList.toggle('open'); }
+function closeDropdown() { document.getElementById('profiles-dropdown').classList.remove('open'); }
+function togglePhotoMenu() { document.getElementById('photo-menu').classList.toggle('open'); }
+function closePhotoMenu() { document.getElementById('photo-menu').classList.remove('open'); }
+
+function renderProfileList() {
+    const el = document.getElementById('profile-list');
+    if (!S.savedProfiles.length) { el.innerHTML = '<div class="no-profiles">Aucun profil sauvegardé</div>'; return; }
+    el.innerHTML = S.savedProfiles.map(p => `
+        <div class="profile-item" data-id="${h(p.id)}">
+            <div class="pi-info">
+                <span class="pi-name">${h(p.name)}</span>
+                <span class="pi-sub">${h(p.breed || 'Sans race')} • ${p.sessions.length} sessions</span>
+            </div>
+            <button class="pi-del" data-id="${h(p.id)}" title="Supprimer">🗑</button>
+        </div>`).join('');
+}
+
+function saveProfile() {
+    const name = document.getElementById('dog-name').value;
+    const id = name.toLowerCase().replace(/\s/g, '-') || String(Date.now());
+    const p = { id, name, age: document.getElementById('dog-age').value, breed: document.getElementById('dog-breed').value, owner: document.getElementById('owner-name').value, photo: S.dogPhoto, sessions: S.sessions, lastUpdated: new Date().toISOString() };
+    S.savedProfiles = [...S.savedProfiles.filter(x => x.id !== id), p];
+    persist(); renderProfileList(); showMsg('PROFIL SAUVEGARDÉ !');
+}
+
+function loadProfile(id) {
+    const p = S.savedProfiles.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('dog-name').value = p.name || '';
+    document.getElementById('dog-age').value = p.age || '';
+    document.getElementById('dog-breed').value = p.breed || '';
+    document.getElementById('owner-name').value = p.owner || '';
+    S.dogPhoto = p.photo || null; S.sessions = p.sessions || [];
+    renderPhoto(); renderSessions(); renderStats();
+    closeDropdown(); showMsg(`${p.name} chargé`);
+}
+
+function deleteProfile(id) {
+    S.savedProfiles = S.savedProfiles.filter(p => p.id !== id);
+    persist(); renderProfileList();
+}
+
+function persist() { localStorage.setItem('etho_track_profiles', JSON.stringify(S.savedProfiles)); }
+
+// ── PHOTO ──────────────────────────────────────────────────────────────────
+function handlePhoto(e) {
+    const file = e.target.files[0]; if (!file) return; e.target.value = '';
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+        const MAX = 200; let w = img.width, ht = img.height;
+        if (w > ht) { if (w > MAX) { ht *= MAX/w; w = MAX; } } else { if (ht > MAX) { w *= MAX/ht; ht = MAX; } }
+        const c = document.createElement('canvas'); c.width = w; c.height = ht;
+        c.getContext('2d').drawImage(img, 0, 0, w, ht);
+        S.dogPhoto = c.toDataURL('image/jpeg', 0.7);
+        renderPhoto(); showMsg('PHOTO OPTIMISÉE'); URL.revokeObjectURL(objectUrl);
+    };
+    img.onerror = () => { showMsg('ERREUR LECTURE IMAGE'); URL.revokeObjectURL(objectUrl); };
+    img.src = objectUrl;
+}
+
+function renderPhoto() {
+    document.getElementById('photo-display').innerHTML = S.dogPhoto
+        ? `<img src="${S.dogPhoto}" class="photo-img" alt="Photo du chien">`
+        : '<div class="photo-placeholder">🐕</div><div class="photo-lbl">Ajouter photo</div>';
+}
+
+// ── FORM ───────────────────────────────────────────────────────────────────
+function toggleBark() {
+    S.aboiement = !S.aboiement;
+    const btn = document.getElementById('bark-btn');
+    btn.className = 'bark-btn ' + (S.aboiement ? 'on' : 'off');
+    document.getElementById('bark-icon').className = S.aboiement ? 'bounce' : '';
+    document.getElementById('bark-text').textContent = S.aboiement ? 'ABOIEMENT : OUI' : 'ABOIEMENT : NON';
+}
+
+// ── TIMER ──────────────────────────────────────────────────────────────────
+function toggleTimer() {
+    S.timerRunning = !S.timerRunning;
+    const btn = document.getElementById('timer-btn');
+    if (S.timerRunning) {
+        btn.textContent = '⏹'; btn.className = 'btn-play stop';
+        S.timerInterval = setInterval(() => {
+            S.timer = Math.round((S.timer + 0.1) * 10) / 10;
+            document.getElementById('timer-display').textContent = S.timer.toFixed(1);
+        }, 100);
+    } else {
+        btn.textContent = '▶'; btn.className = 'btn-play start';
+        clearInterval(S.timerInterval);
+    }
+}
+
+function resetTimer() {
+    clearInterval(S.timerInterval); S.timerRunning = false; S.timer = 0;
+    document.getElementById('timer-display').textContent = '0.0';
+    document.getElementById('timer-btn').textContent = '▶';
+    document.getElementById('timer-btn').className = 'btn-play start';
+}
+
+// ── SESSION ────────────────────────────────────────────────────────────────
+function saveSession() {
+    const sess = {
+        date: new Date().toLocaleDateString('fr-FR'),
+        environnement: document.getElementById('sel-env').value,
+        typeSortie: document.getElementById('sel-type').value,
+        attache: S.attache, excitation: S.excitation, aboiement: S.aboiement,
+        reactionSociale: document.getElementById('sel-social').value,
+        tempsRappel: S.recall, notes: document.getElementById('notes').value,
+        timer: S.timer.toFixed(1), location: S.location,
+        coords: S.coords.lat ? `${S.coords.lat}, ${S.coords.lng}` : null,
+        rappels: S.rappelCount,
+        weather: S.weather ? `${S.weather.temp}°C, vent ${S.weather.wind}km/h` : null
+    };
+    S.sessions = [sess, ...S.sessions];
+
+    // Auto-save profile
+    const name = document.getElementById('dog-name').value;
+    const id = name.toLowerCase().replace(/\s/g, '-') || String(Date.now());
+    const p = { id, name, age: document.getElementById('dog-age').value, breed: document.getElementById('dog-breed').value, owner: document.getElementById('owner-name').value, photo: S.dogPhoto, sessions: S.sessions, lastUpdated: new Date().toISOString() };
+    S.savedProfiles = [...S.savedProfiles.filter(x => x.id !== id), p];
+    persist(); renderProfileList();
+    renderSessions(); renderStats();
+
+    // Reset form
+    document.getElementById('notes').value = '';
+    S.aboiement = false;
+    document.getElementById('bark-btn').className = 'bark-btn off';
+    document.getElementById('bark-icon').className = '';
+    document.getElementById('bark-text').textContent = 'ABOIEMENT : NON';
+    resetTimer(); S.rappelCount = 0;
+    document.getElementById('rappel-count').textContent = '0';
+    showMsg('SESSION SAUVEGARDÉE !');
+}
+
+function renderSessions() {
+    const sec = document.getElementById('sessions-section');
+    const list = document.getElementById('sess-list');
+    const count = document.getElementById('sess-count');
+    const shown = S.sessions.slice(0, 14);
+    if (!shown.length) { sec.style.display = 'none'; return; }
+    sec.style.display = 'block';
+    count.textContent = shown.length;
+    list.innerHTML = shown.map((s, i) => {
+        const sub = [s.weather ? h(s.weather) + ' •' : '', h(s.location || s.environnement), '•', h(s.attache), '•', `${s.rappels} rappel${s.rappels > 1 ? 's' : ''}`].filter(Boolean).join(' ');
+        return `<div class="glass sess-item">
+            <div class="si-left">
+                <div class="si-main">
+                    <span class="si-date">${h(s.date)}</span>
+                    <span class="si-sep">|</span>
+                    <span class="si-recall">${h(s.tempsRappel)}</span>
+                    ${s.aboiement ? '<span class="si-bark">🔊</span>' : ''}
+                    ${s.reactionSociale === 'conflit' ? '<span class="si-conflict">🛑 CONFLIT</span>' : ''}
+                </div>
+                <div class="si-sub">${sub}</div>
+                ${s.coords ? `<div class="si-coords">${h(s.coords)}</div>` : ''}
+            </div>
+            <div class="si-right">
+                <button class="btn-del-sess" data-idx="${i}" title="Supprimer">🗑</button>
+                <div class="si-exc">${s.excitation}/5</div>
+            </div>
+        </div>`;
+    }).join('');
+    list.querySelectorAll('.btn-del-sess').forEach(btn => {
+        btn.addEventListener('click', () => deleteSession(parseInt(btn.dataset.idx)));
+    });
+}
+
+function deleteSession(i) {
+    S.sessions.splice(i, 1);
+    renderSessions(); renderStats(); showMsg('SESSION SUPPRIMÉE');
+}
+
+// ── STATS ──────────────────────────────────────────────────────────────────
+function renderStats() {
+    const w = document.getElementById('stats-widget');
+    if (!S.sessions.length) { w.style.display = 'none'; return; }
+    w.style.display = 'block';
+    const focus = (S.sessions.filter(s => ['focusmaitre','distant','neutre'].includes(s.reactionSociale)).length / S.sessions.length * 100).toFixed(0);
+    const exc = (S.sessions.reduce((a, s) => a + parseInt(s.excitation), 0) / S.sessions.length).toFixed(1);
+    document.getElementById('stat-focus').textContent = focus + '%';
+    document.getElementById('stat-exc').textContent = exc;
+}
+
+// ── RESET ──────────────────────────────────────────────────────────────────
+function resetSessions() {
+    const btn = document.getElementById('reset-btn');
+    if (!S.confirmReset) {
+        S.confirmReset = true;
+        btn.classList.add('confirm'); btn.textContent = "↺ CONFIRMER L'EFFACEMENT ?";
+        if (S.confirmTimeout) clearTimeout(S.confirmTimeout);
+        S.confirmTimeout = setTimeout(() => { S.confirmReset = false; btn.classList.remove('confirm'); btn.textContent = '↺ RESET DES SESSIONS'; }, 4000);
+        showMsg('CONFIRMATION REQUISE'); return;
+    }
+    S.sessions = []; S.confirmReset = false;
+    btn.classList.remove('confirm'); btn.textContent = '↺ RESET DES SESSIONS';
+    resetTimer(); S.rappelCount = 0; document.getElementById('rappel-count').textContent = '0';
+    renderSessions(); renderStats(); showMsg('HISTORIQUE EFFACÉ');
+}
+
+// ── REPORT ─────────────────────────────────────────────────────────────────
+function buildReport() {
+    const ss = S.sessions.slice(0, 14);
+    if (!ss.length) return 'Aucune session enregistrée pour le moment.';
+    const name = document.getElementById('dog-name').value;
+    const breed = document.getElementById('dog-breed').value;
+    const age = document.getElementById('dog-age').value;
+    const owner = document.getElementById('owner-name').value;
+    const avgExc = (ss.reduce((a, s) => a + parseInt(s.excitation), 0) / ss.length).toFixed(1);
+    const barkN = ss.filter(s => s.aboiement).length;
+    const conflN = ss.filter(s => s.reactionSociale === 'conflit').length;
+    const envs = [...new Set(ss.map(s => s.environnement))].join(', ');
+    let t = `🐾 RAPPORT DE SUIVI : ${name.toUpperCase()}\n`;
+    if (breed || age || owner) t += `${breed ? 'Race: '+breed+' | ' : ''}${age ? 'Âge: '+age+' | ' : ''}${owner ? 'Propriétaire: '+owner : ''}\n`;
+    t += `-------------------------------------------\n`;
+    t += `Période : Analyse des ${ss.length} dernières sessions\n`;
+    t += `Lieux fréquentés : ${envs}\n`;
+    t += `Niveau d'excitation moyen : ${avgExc}/5\n`;
+    t += `Sessions avec aboiements : ${barkN}/${ss.length}\n`;
+    if (conflN > 0) t += `Épisodes de conflit : ${conflN}/${ss.length}\n`;
+    t += `\nOBSERVATIONS DÉTAILLÉES :\n`;
+    ss.forEach(s => {
+        const icon = ['focusmaitre','distant','neutre'].includes(s.reactionSociale) ? '✅' : s.reactionSociale === 'conflit' ? '🛑' : '⚠️';
+        t += `- ${s.date}${s.weather ? ` (${s.weather})` : ''}${s.coords ? ` [Géo: ${s.coords}]` : ''} [${s.location || 'Inconnu'}] : ${icon} Réaction : ${s.reactionSociale}${s.attache ? ' | Attache : '+s.attache : ''}${s.aboiement ? ' 🔊 [ABOIEMENT]' : ''}. | Rappel : ${s.tempsRappel}.${s.rappels > 0 ? ' | Rappels : '+s.rappels : ''}${s.notes ? ' Note : '+s.notes : ''}\n`;
+    });
+    t += `\nSYNTHÈSE ÉTHOLOGIQUE :\n`;
+    const rcRate = (ss.filter(s => s.tempsRappel === '0-5s').length / ss.length * 100).toFixed(0);
+    if (avgExc > 3.5 || conflN > 2) t += `Sur cet échantillon, on observe une réactivité ou des conflits encore fréquents. Il est vivement conseillé de réduire la difficulté des environnements. `;
+    else if (avgExc < 2.5) t += `${name} montre une belle stabilité émotionnelle sur les dernières entrées. `;
+    if (barkN > ss.length / 2) t += `Une forte présence d'aboiements est notée (${Math.round(barkN/ss.length*100)}% des cas). `;
+    t += `Le rappel est jugé immédiat (0-5s) dans ${rcRate}% des cas observés.`;
+    return t;
+}
+
+function openReport() {
+    document.getElementById('report-text').textContent = buildReport();
+    document.getElementById('report-modal').classList.add('open');
+}
+function closeReport() { document.getElementById('report-modal').classList.remove('open'); }
+
+async function copyReport() {
+    const txt = buildReport();
+    try { await navigator.clipboard.writeText(txt); }
+    catch {
+        const ta = document.createElement('textarea'); ta.value = txt;
+        ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    }
+    showMsg('COPIÉ DANS LE PRESSE-PAPIER');
+}
+
+async function shareReport() {
+    const name = document.getElementById('dog-name').value;
+    const txt = buildReport();
+    if (navigator.share) { try { await navigator.share({ title: `Bilan Etho-Track - ${name}`, text: txt }); } catch {} }
+    else { window.location.href = `mailto:?subject=${encodeURIComponent('Bilan Etho-Track - ' + name)}&body=${encodeURIComponent(txt)}`; }
+}
+
+// ── JSON ───────────────────────────────────────────────────────────────────
+function exportJSON() {
+    const name = document.getElementById('dog-name').value;
+    const data = { profiles: S.savedProfiles, currentDog: { name, age: document.getElementById('dog-age').value, breed: document.getElementById('dog-breed').value, owner: document.getElementById('owner-name').value, photo: S.dogPhoto, sessions: S.sessions }, exportDate: new Date().toISOString() };
+    const a = document.createElement('a');
+    a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data, null, 2));
+    a.download = `etho_track_backup_${name}_${new Date().toISOString().split('T')[0]}.json`;
+    a.click(); showMsg('JSON EXPORTÉ'); closeDropdown();
+}
+
+function importJSON(e) {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        try {
+            const json = JSON.parse(ev.target.result);
+            const ok = p => p && typeof p === 'object' && typeof p.name === 'string';
+            if (json.profiles && Array.isArray(json.profiles) && json.profiles.every(ok)) {
+                S.savedProfiles = json.profiles; persist(); renderProfileList();
+                if (json.currentDog) {
+                    const d = json.currentDog;
+                    document.getElementById('dog-name').value = d.name || '';
+                    document.getElementById('dog-age').value = d.age || '';
+                    document.getElementById('dog-breed').value = d.breed || '';
+                    document.getElementById('owner-name').value = d.owner || '';
+                    S.dogPhoto = d.photo || null; S.sessions = d.sessions || [];
+                    renderPhoto(); renderSessions(); renderStats();
+                }
+                showMsg('DONNÉES RESTAURÉES');
+            } else { showMsg('JSON INVALIDE'); }
+        } catch { showMsg('ERREUR LECTURE'); }
+    };
+    reader.readAsText(file); e.target.value = ''; closeDropdown();
+}
+
+// ── UTILS ──────────────────────────────────────────────────────────────────
+function h(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
 </body>
 </html>
