@@ -231,6 +231,11 @@
         .pfield-lbl { font-size: 0.5625rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
         .pfield-input { background: rgba(255,255,255,0.05); border: none; border-radius: 0.75rem; color: white; font-size: 0.875rem; font-weight: 700; text-align: center; padding: 0.5rem; width: 100%; outline: none; }
         .pfield-input::placeholder { color: rgba(255,255,255,0.2); }
+        .profile-extras { display: flex; align-items: center; gap: 1rem; }
+        .sexe-group { grid-template-columns: 1fr 1fr !important; flex: 1; }
+        .sterilise-row { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap; }
+        .sterilise-row input[type='checkbox'] { width: 1.25rem; height: 1.25rem; accent-color: #4ade80; cursor: pointer; flex-shrink: 0; }
+        .sterilise-lbl { font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.05em; }
 
         /* ── FORM CARD ── */
         .form-card { padding: 1.5rem; border-radius: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
@@ -453,6 +458,16 @@
                         <div class="pfield"><span class="pfield-lbl">Race</span><input type="text" id="dog-breed" class="pfield-input" placeholder="-"></div>
                         <div class="pfield"><span class="pfield-lbl">Proprio</span><input type="text" id="owner-name" class="pfield-input" placeholder="-"></div>
                     </div>
+                    <div class="profile-extras">
+                        <div class="btn-group sexe-group" id="sexe-group">
+                            <button class="tag-btn active" data-val="male">♂ Mâle</button>
+                            <button class="tag-btn" data-val="femelle">♀ Femelle</button>
+                        </div>
+                        <label class="sterilise-row">
+                            <input type="checkbox" id="sterilise-cb">
+                            <span class="sterilise-lbl">Stérilisé·e</span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -548,7 +563,7 @@
 
                 <button id="bark-btn" class="bark-btn off">
                     <span id="bark-icon">🔊</span>
-                    <span id="bark-text">ABOIEMENT : NON</span>
+                    <span id="bark-text">VOCALISES : NON</span>
                 </button>
 
                 <textarea id="notes" class="notes-ta" placeholder="Notes de session..."></textarea>
@@ -590,6 +605,8 @@ const S = {
     recall: '0-5s',
     excitation: 3,
     aboiement: false,
+    sexe: 'male',
+    sterilise: false,
     timer: 0,
     timerRunning: false,
     timerInterval: null,
@@ -652,6 +669,13 @@ document.addEventListener('DOMContentLoaded', () => {
         S.excitation = parseInt(e.target.value);
         document.getElementById('exc-val').textContent = S.excitation;
     });
+    document.getElementById('sexe-group').addEventListener('click', e => {
+        const btn = e.target.closest('.tag-btn');
+        if (!btn) return;
+        S.sexe = btn.dataset.val;
+        document.querySelectorAll('#sexe-group .tag-btn').forEach(b => b.classList.toggle('active', b === btn));
+    });
+    document.getElementById('sterilise-cb').addEventListener('change', e => { S.sterilise = e.target.checked; });
     document.getElementById('bark-btn').addEventListener('click', toggleBark);
 
     // Timer
@@ -783,7 +807,7 @@ function renderProfileList() {
 function saveProfile() {
     const name = document.getElementById('dog-name').value;
     const id = name.toLowerCase().replace(/\s/g, '-') || String(Date.now());
-    const p = { id, name, age: document.getElementById('dog-age').value, breed: document.getElementById('dog-breed').value, owner: document.getElementById('owner-name').value, photo: S.dogPhoto, sessions: S.sessions, lastUpdated: new Date().toISOString() };
+    const p = { id, name, age: document.getElementById('dog-age').value, breed: document.getElementById('dog-breed').value, owner: document.getElementById('owner-name').value, sexe: S.sexe, sterilise: S.sterilise, photo: S.dogPhoto, sessions: S.sessions, lastUpdated: new Date().toISOString() };
     S.savedProfiles = [...S.savedProfiles.filter(x => x.id !== id), p];
     persist(); renderProfileList(); showMsg('PROFIL SAUVEGARDÉ !');
 }
@@ -795,6 +819,10 @@ function loadProfile(id) {
     document.getElementById('dog-age').value = p.age || '';
     document.getElementById('dog-breed').value = p.breed || '';
     document.getElementById('owner-name').value = p.owner || '';
+    S.sexe = p.sexe || 'male';
+    S.sterilise = p.sterilise || false;
+    document.querySelectorAll('#sexe-group .tag-btn').forEach(b => b.classList.toggle('active', b.dataset.val === S.sexe));
+    document.getElementById('sterilise-cb').checked = S.sterilise;
     S.dogPhoto = p.photo || null; S.sessions = p.sessions || [];
     renderPhoto(); renderSessions(); renderStats();
     closeDropdown(); showMsg(`${p.name} chargé`);
@@ -836,7 +864,7 @@ function toggleBark() {
     const btn = document.getElementById('bark-btn');
     btn.className = 'bark-btn ' + (S.aboiement ? 'on' : 'off');
     document.getElementById('bark-icon').className = S.aboiement ? 'bounce' : '';
-    document.getElementById('bark-text').textContent = S.aboiement ? 'ABOIEMENT : OUI' : 'ABOIEMENT : NON';
+    document.getElementById('bark-text').textContent = S.aboiement ? 'VOCALISES : OUI' : 'VOCALISES : NON';
 }
 
 // ── TIMER ──────────────────────────────────────────────────────────────────
@@ -881,7 +909,7 @@ function saveSession() {
     // Auto-save profile
     const name = document.getElementById('dog-name').value;
     const id = name.toLowerCase().replace(/\s/g, '-') || String(Date.now());
-    const p = { id, name, age: document.getElementById('dog-age').value, breed: document.getElementById('dog-breed').value, owner: document.getElementById('owner-name').value, photo: S.dogPhoto, sessions: S.sessions, lastUpdated: new Date().toISOString() };
+    const p = { id, name, age: document.getElementById('dog-age').value, breed: document.getElementById('dog-breed').value, owner: document.getElementById('owner-name').value, sexe: S.sexe, sterilise: S.sterilise, photo: S.dogPhoto, sessions: S.sessions, lastUpdated: new Date().toISOString() };
     S.savedProfiles = [...S.savedProfiles.filter(x => x.id !== id), p];
     persist(); renderProfileList();
     renderSessions(); renderStats();
@@ -891,7 +919,7 @@ function saveSession() {
     S.aboiement = false;
     document.getElementById('bark-btn').className = 'bark-btn off';
     document.getElementById('bark-icon').className = '';
-    document.getElementById('bark-text').textContent = 'ABOIEMENT : NON';
+    document.getElementById('bark-text').textContent = 'VOCALISES : NON';
     resetTimer(); S.rappelCount = 0;
     document.getElementById('rappel-count').textContent = '0';
     showMsg('SESSION SAUVEGARDÉE !');
@@ -975,23 +1003,25 @@ function buildReport() {
     const conflN = ss.filter(s => s.reactionSociale === 'conflit').length;
     const envs = [...new Set(ss.map(s => s.environnement))].join(', ');
     let t = `🐾 RAPPORT DE SUIVI : ${name.toUpperCase()}\n`;
-    if (breed || age || owner) t += `${breed ? 'Race: '+breed+' | ' : ''}${age ? 'Âge: '+age+' | ' : ''}${owner ? 'Propriétaire: '+owner : ''}\n`;
+    const sexeLabel = S.sexe === 'femelle' ? 'Femelle' : 'Mâle';
+    const steriliseLabel = S.sterilise ? ' • Stérilisé·e' : '';
+    if (breed || age || owner) t += `${breed ? 'Race: '+breed+' | ' : ''}${age ? 'Âge: '+age+' | ' : ''}${sexeLabel}${steriliseLabel}${owner ? ' | Propriétaire: '+owner : ''}\n`;
     t += `-------------------------------------------\n`;
     t += `Période : Analyse des ${ss.length} dernières sessions\n`;
     t += `Lieux fréquentés : ${envs}\n`;
     t += `Niveau d'excitation moyen : ${avgExc}/5\n`;
-    t += `Sessions avec aboiements : ${barkN}/${ss.length}\n`;
+    t += `Sessions avec vocalises : ${barkN}/${ss.length}\n`;
     if (conflN > 0) t += `Épisodes de conflit : ${conflN}/${ss.length}\n`;
     t += `\nOBSERVATIONS DÉTAILLÉES :\n`;
     ss.forEach(s => {
         const icon = ['focusmaitre','distant','neutre'].includes(s.reactionSociale) ? '✅' : s.reactionSociale === 'conflit' ? '🛑' : '⚠️';
-        t += `- ${s.date}${s.weather ? ` (${s.weather})` : ''}${s.coords ? ` [Géo: ${s.coords}]` : ''} [${s.location || 'Inconnu'}] : ${icon} Réaction : ${s.reactionSociale}${s.attache ? ' | Attache : '+s.attache : ''}${s.aboiement ? ' 🔊 [ABOIEMENT]' : ''}. | Rappel : ${s.tempsRappel}.${s.rappels > 0 ? ' | Rappels : '+s.rappels : ''}${s.notes ? ' Note : '+s.notes : ''}\n`;
+        t += `- ${s.date}${s.weather ? ` (${s.weather})` : ''}${s.coords ? ` [Géo: ${s.coords}]` : ''} [${s.location || 'Inconnu'}] : ${icon} Réaction : ${s.reactionSociale}${s.attache ? ' | Attache : '+s.attache : ''}${s.aboiement ? ' 🔊 [VOCALISES]' : ''}. | Rappel : ${s.tempsRappel}.${s.rappels > 0 ? ' | Rappels : '+s.rappels : ''}${s.notes ? ' Note : '+s.notes : ''}\n`;
     });
     t += `\nSYNTHÈSE ÉTHOLOGIQUE :\n`;
     const rcRate = (ss.filter(s => s.tempsRappel === '0-5s').length / ss.length * 100).toFixed(0);
     if (avgExc > 3.5 || conflN > 2) t += `Sur cet échantillon, on observe une réactivité ou des conflits encore fréquents. Il est vivement conseillé de réduire la difficulté des environnements. `;
     else if (avgExc < 2.5) t += `${name} montre une belle stabilité émotionnelle sur les dernières entrées. `;
-    if (barkN > ss.length / 2) t += `Une forte présence d'aboiements est notée (${Math.round(barkN/ss.length*100)}% des cas). `;
+    if (barkN > ss.length / 2) t += `Une forte présence de vocalises est notée (${Math.round(barkN/ss.length*100)}% des cas). `;
     t += `Le rappel est jugé immédiat (0-5s) dans ${rcRate}% des cas observés.`;
     return t;
 }
@@ -1023,7 +1053,7 @@ async function shareReport() {
 // ── JSON ───────────────────────────────────────────────────────────────────
 function exportJSON() {
     const name = document.getElementById('dog-name').value;
-    const data = { profiles: S.savedProfiles, currentDog: { name, age: document.getElementById('dog-age').value, breed: document.getElementById('dog-breed').value, owner: document.getElementById('owner-name').value, photo: S.dogPhoto, sessions: S.sessions }, exportDate: new Date().toISOString() };
+    const data = { profiles: S.savedProfiles, currentDog: { name, age: document.getElementById('dog-age').value, breed: document.getElementById('dog-breed').value, owner: document.getElementById('owner-name').value, sexe: S.sexe, sterilise: S.sterilise, photo: S.dogPhoto, sessions: S.sessions }, exportDate: new Date().toISOString() };
     const a = document.createElement('a');
     a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data, null, 2));
     a.download = `etho_track_backup_${name}_${new Date().toISOString().split('T')[0]}.json`;
@@ -1045,6 +1075,10 @@ function importJSON(e) {
                     document.getElementById('dog-age').value = d.age || '';
                     document.getElementById('dog-breed').value = d.breed || '';
                     document.getElementById('owner-name').value = d.owner || '';
+                    S.sexe = d.sexe || 'male';
+                    S.sterilise = d.sterilise || false;
+                    document.querySelectorAll('#sexe-group .tag-btn').forEach(b => b.classList.toggle('active', b.dataset.val === S.sexe));
+                    document.getElementById('sterilise-cb').checked = S.sterilise;
                     S.dogPhoto = d.photo || null; S.sessions = d.sessions || [];
                     renderPhoto(); renderSessions(); renderStats();
                 }
