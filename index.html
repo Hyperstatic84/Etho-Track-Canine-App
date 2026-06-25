@@ -11,10 +11,10 @@
     <meta name="theme-color" content="#3730a3">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234ade80' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M22 12h-4l-3 9L9 3l-3 9H2'/%3e%3c/svg%3e">
     <link rel="apple-touch-icon" href="icon.svg">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4.1.8/dist/cdn.global.js"></script>
+    <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.26.10/babel.min.js"></script>
     <style>
         /* Fond global indigo profond avec dégradé */
         body {
@@ -143,12 +143,13 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="theme-color" content="#3730a3">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com; style-src 'unsafe-inline'; connect-src https://api.open-meteo.com https://nominatim.openstreetmap.org; img-src 'self' data: blob:; font-src 'self'; object-src 'none'; base-uri 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' 'unsafe-eval' https://unpkg.com; style-src 'unsafe-inline'; connect-src https://api.open-meteo.com https://nominatim.openstreetmap.org; img-src 'self' data: blob:; font-src 'self'; object-src 'none'; base-uri 'self';">
 </head>
 <body>
     <div id="root"></div>
 
-    <script type="text/babel">
+    <script type="text/babel" data-presets="react">
+        /* @jsxRuntime classic */
         const { useState, useEffect, useRef } = React;
 
         const Icons = {
