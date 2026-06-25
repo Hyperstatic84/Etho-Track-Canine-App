@@ -81,12 +81,14 @@
         /* ── HELP BUTTON ── */
         .header-top { width: 100%; max-width: 400px; display: flex; align-items: center; justify-content: center; }
         .help-btn {
-            display: inline-flex; align-items: center;
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; max-width: 280px; margin: 0 auto;
             padding: 0.75rem 2rem; border-radius: 9999px;
             background: rgba(239,68,68,0.25); border: 1px solid rgba(239,68,68,0.6);
             color: #fca5a5; font-size: 0.8rem; font-weight: 900;
             text-transform: uppercase; letter-spacing: 0.1em;
-            cursor: pointer; transition: all 0.2s;
+            cursor: pointer; transition: background 0.2s, color 0.2s;
+            animation: pulse 2s infinite;
         }
         .help-btn:hover { background: rgba(239,68,68,0.4); color: white; }
 
