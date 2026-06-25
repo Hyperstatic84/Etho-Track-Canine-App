@@ -143,6 +143,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="theme-color" content="#3730a3">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com; style-src 'unsafe-inline'; connect-src https://api.open-meteo.com https://nominatim.openstreetmap.org; img-src 'self' data: blob:; font-src 'self'; object-src 'none'; base-uri 'self';">
 </head>
 <body>
     <div id="root"></div>
@@ -345,8 +346,9 @@
                     try {
                         const json = JSON.parse(e.target.result);
                         
-                        // Validation sommaire
-                        if (json.profiles && Array.isArray(json.profiles)) {
+                        // Validation: profiles must be an array of objects with a string name
+                        const isValidProfile = (p) => p && typeof p === 'object' && typeof p.name === 'string';
+                        if (json.profiles && Array.isArray(json.profiles) && json.profiles.every(isValidProfile)) {
                             setSavedProfiles(json.profiles);
                             localStorage.setItem('etho_track_profiles', JSON.stringify(json.profiles));
                             
@@ -448,7 +450,7 @@
                             setCoords({ lat: latitude.toFixed(4), lng: longitude.toFixed(4) });
                             fetchWeather(latitude, longitude);
                             try {
-                                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`, { headers: { 'User-Agent': 'EthoTrack/1.0' } });
                                 const data = await response.json();
                                 const city = data.address.city || data.address.town || data.address.village || "Zone isolée";
                                 setLocation(city);
@@ -661,7 +663,7 @@
                         console.log("Erreur partage:", err);
                     }
                 } else {
-                    const mailtoUrl = `mailto:?subject=Bilan Etho-Track - ${dogName}&body=${encodeURIComponent(text)}`;
+                    const mailtoUrl = `mailto:?subject=${encodeURIComponent(`Bilan Etho-Track - ${dogName}`)}&body=${encodeURIComponent(text)}`;
                     window.location.href = mailtoUrl;
                 }
             };
@@ -711,14 +713,20 @@
                                 </div>
                                 <div className="grid grid-cols-1 gap-2">
                                     <button 
-                                        onClick={() => {
+                                        onClick={async () => {
                                             const text = generateReportText();
-                                            const textArea = document.createElement("textarea");
-                                            textArea.value = text;
-                                            document.body.appendChild(textArea);
-                                            textArea.select();
-                                            document.execCommand('copy');
-                                            document.body.removeChild(textArea);
+                                            try {
+                                                await navigator.clipboard.writeText(text);
+                                            } catch {
+                                                const textArea = document.createElement("textarea");
+                                                textArea.value = text;
+                                                textArea.style.position = "fixed";
+                                                textArea.style.opacity = "0";
+                                                document.body.appendChild(textArea);
+                                                textArea.select();
+                                                document.execCommand('copy');
+                                                document.body.removeChild(textArea);
+                                            }
                                             setMessage("COPIÉ DANS LE PRESSE-PAPIER");
                                             setTimeout(() => setMessage(null), 2000);
                                         }}
